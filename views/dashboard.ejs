@@ -1,0 +1,27 @@
+<!-- views/dashboard.ejs -->
+<%- include('partials/header') %>
+<div class="container mt-5">
+  <div class="signBox">
+  <h2>Dashboard</h2>
+
+  <div class="mt-4">
+    <a href="/organizer/create-vote-session" class="btn btn-warning">Create New Vote Collection</a>
+  </div>
+
+  <div class="mt-5">
+    <h3>Your Vote Collections</h3>
+    <% if (voteSession.length > 0) { %>
+      <ul class="list-group">
+        <% voteSession.forEach(voteSession => { %>
+          <li class="list-group-item bg-dark">
+            <strong class="voteCollectionText"><%= voteSession.title %></strong> <span class="text-muted">(<%= voteSession.dateCreated.toDateString() %>)</span>
+          </li>
+        <% }) %>
+      </ul>
+    <% } else { %>
+      <p>You have no vote collections yet.</p>
+    <% } %>
+  </div>
+</div>
+</div>
+<%- include('partials/footer') %>

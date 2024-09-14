@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap');
+
+
+body{
+    background-color: #0F0F0F;
+    color: #eeeeee;
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-style: normal;
+}
+
+.navbar-dark{
+    background-color: #0F0F0F !important;
+}
+
+.box{
+    width: 30rem;
+    padding: 1rem;
+    text-align: center;
+}
+
+.box h1{
+    font-family: "Dancing Script", cursive;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 3rem;
+}
+
+.signBox{
+    width: 30rem;
+    margin-top: 7rem;
+}
+
+.voteCollectionText{
+    font-weight: bold;
+    color: aqua !important;
+}
