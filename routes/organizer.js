@@ -46,6 +46,8 @@ router.post('/create-vote-session', ensureAuthenticated, async (req, res) => {
     res.render('createVoteSession', { error: 'An error occurred. Please try again.' });
   }
 });
-  
+
+
+
 
 module.exports = router;

@@ -57,10 +57,12 @@ app.set('view engine', 'ejs');
 const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
 const organizerRouter = require('./routes/organizer');
+const questionsRouter = require('./routes/questions');
 
 app.use('/', indexRouter);
 app.use('/auth', authRouter);
 app.use('/organizer', organizerRouter);
+app.use('/organizer', questionsRouter);
 
 // Start Server
 const PORT = process.env.PORT || 3000;

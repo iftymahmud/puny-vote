@@ -11,6 +11,23 @@ body{
     font-style: normal;
 }
 
+input[type="radio"] {
+    display: none; 
+}
+
+.form-control {
+    background-color: #333; /* Dark background color */
+    color: #fff; /* White text color */
+    border: 1px solid #555; /* Border color */
+  }
+
+  .form-control::placeholder {
+    color: #aaa; /* Placeholder text color */
+  }
+
+
+
+
 .navbar-dark{
     background-color: #0F0F0F !important;
 }
@@ -31,6 +48,10 @@ body{
 
 .signBox{
     width: 30rem;
+    margin-top: 7rem;
+}
+
+.questionBox{
     margin-top: 7rem;
 }
 
