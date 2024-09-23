@@ -8,11 +8,20 @@
     <a href="/organizer/create-vote-session" class="btn btn-warning">Create New Vote Collection</a>
   </div>
 
-  <div class="mt-5">
+  <div class="my-5">
     <h3>Your Vote Collections</h3>
     <% if (voteSession.length > 0) { %>
       <ul class="list-group">
         <% voteSession.forEach(voteSession => { %>
+
+
+          <% if(voteSession.voteSessionSubmitted == null || voteSession.voteSessionSubmitted == 'no') { %>
+            <h5>"VoteSessionSubmitted = no"</h5>
+          <% } %>
+
+
+
+
           <li class="list-group-item bg-dark">
             <strong class="voteCollectionText"><%= voteSession.title %></strong> <span class="text-muted">(<%= voteSession.dateCreated.toDateString() %>)</span>
           </li>

@@ -1,61 +1,105 @@
+<!-- views/createQuestions.ejs -->
 <%- include('partials/header') %>
 
 <div class="container mt-5">
   <div class="questionBox">
-    
+
     <div class="row">
 
+      <!-- Column 1: Question Number and Vote Type Selection -->
       <div class="col-3">
-        <h2>Question : <strong style="color:#ffc107">01</strong></h2>
-        
+        <h2>Question: <strong style="color:#ffc107"><%= questionNo || 1 %></strong></h2>
+
+        <!-- Vote Type Radio Buttons (Outside the Form) -->
         <div class="d-flex flex-column btn-group-toggle" data-toggle="buttons">
-          <label class="btn btn-outline-info mb-2 active">
-            <input type="radio" name="options" id="option1" autocomplete="off" checked onclick="showType('fibonacci')"> Fibonacci
+          <!-- Fibonacci Radio Button -->
+          <label class="btn btn-outline-info mb-2 <%= lastType === 'fibonacci' ? 'active' : '' %>">
+            <input 
+              type="radio" 
+              name="voteTypeRadio" 
+              value="fibonacci" 
+              id="option1" 
+              autocomplete="off" 
+              <%= lastType === 'fibonacci' ? 'checked' : '' %> 
+              onclick="setVoteType('fibonacci')"> Fibonacci
           </label>
-          <label class="btn btn-outline-info mb-2">
-            <input type="radio" name="options" id="option2" autocomplete="off" onclick="showType('tshirt')"> T-Shirt
+
+          <!-- T-Shirt Radio Button -->
+          <label class="btn btn-outline-info mb-2 <%= lastType === 'tshirt' ? 'active' : '' %>">
+            <input 
+              type="radio" 
+              name="voteTypeRadio" 
+              value="tshirt" 
+              id="option2" 
+              autocomplete="off" 
+              <%= lastType === 'tshirt' ? 'checked' : '' %> 
+              onclick="setVoteType('tshirt')"> T-Shirt
           </label>
-          <label class="btn btn-outline-info mb-2">
-            <input type="radio" name="options" id="option3" autocomplete="off" onclick="showType('custom')"> Custom
+
+          <!-- Custom Radio Button -->
+          <label class="btn btn-outline-info mb-2 <%= lastType === 'custom' ? 'active' : '' %>">
+            <input 
+              type="radio" 
+              name="voteTypeRadio" 
+              value="custom" 
+              id="option3" 
+              autocomplete="off" 
+              <%= lastType === 'custom' ? 'checked' : '' %> 
+              onclick="setVoteType('custom')"> Custom
           </label>
         </div>
-        
-        <!-- Submit Everything -->
+
+        <!-- Submit All Questions Button -->
         <div class="questionSubmission mt-5">
           <label>Finished Adding All Questions?</label> <br>
-          <button class="btn btn-warning" onclick="goToAction('/organizer/dashboard')">Submit All Questions</button>
+          <button type="button" class="btn btn-warning" onclick="goToAction('/organizer/dashboard/<%= voteSessionId %>')">Submit All Questions</button>
         </div>
       </div>
 
+      <!-- Column 2: Spacer (Optional) -->
       <div class="col-3">
-        <!-- Do Nothing -->
+        <!-- Optional Content or Leave Empty -->
       </div>
-      
-      <!-- +++++++++++++Options++++++++ -->
-      <div class="col-6 mt-2">
-        <form action="/organizer/create-questions" method="POST">
+
+      <!-- Column 3: Form for Adding Questions -->
+      <div class="col-6">
+        <h3><span class="text-info">Collection:</span> <%= voteSessionTitle %></h3>
+
+        <!-- 
+          - Action: Submits to '/organizer/create-questions/:voteSessionId'
+          - Method: POST
+        -->
+        <form action='/organizer/create-questions/<%= voteSessionId %>' method="POST">
           <div class="form-group">
+            <!-- Question Text Input -->
             <input type="text" name="title" class="form-control" placeholder="Type Your Question Here" required />
 
+            <!-- Label for Options -->
             <label class="mt-3">Modify Options</label>
-            
-            <!-- Fibonacci Section (Default Visible) -->
+
+            <!-- Hidden Input to Store voteType -->
+            <input type="hidden" name="voteType" id="hiddenVoteType" value="<%= lastType || 'fibonacci' %>">
+
+            <!-- Options Sections Based on voteType -->
+
+            <!-- Fibonacci Section (Visible if lastType is 'fibonacci') -->
             <div id="fibonacciSection">
               <%- include('types/fibonacci') %>
             </div>
-            
-            <!-- T-Shirt Section (Hidden Initially) -->
+
+            <!-- T-Shirt Section (Visible if lastType is 'tshirt') -->
             <div id="tshirtSection" style="display: none;">
               <%- include('types/tshirt') %>
             </div>
 
-            <!-- Custom Section (Hidden Initially) -->
+            <!-- Custom Section (Visible if lastType is 'custom') -->
             <div id="customSection" style="display: none;">
               <%- include('types/custom') %>
             </div>
 
           </div>
-          <button type="submit" class="btn btn-sm btn-info">Add it to collection</button>
+          <!-- Submit Button for Adding a Single Question -->
+          <button type="submit" class="btn btn-sm btn-info">Add to Collection</button>
         </form>
       </div>
 
@@ -63,32 +107,89 @@
   </div>
 </div>
 
+<!-- JavaScript Section -->
 <script>
-  // Function to show/hide specific question types based on the user's selection
+  /**
+   * Function to set the voteType based on selected radio button.
+   * Updates the hidden input field and shows the corresponding options section.
+   * @param {string} type - The selected vote type ('fibonacci', 'tshirt', 'custom').
+   */
+  function setVoteType(type) {
+    // Update the hidden input value
+    document.getElementById('hiddenVoteType').value = type;
+
+    // Show the corresponding options section
+    showType(type);
+  }
+
+  /**
+   * Function to display the appropriate options section based on voteType.
+   * Hides all sections first, then displays the selected one.
+   * @param {string} type - The selected vote type.
+   */
   function showType(type) {
     // Hide all sections initially
     document.getElementById('fibonacciSection').style.display = 'none';
     document.getElementById('tshirtSection').style.display = 'none';
     document.getElementById('customSection').style.display = 'none';
 
-    // Show the selected section based on the radio button clicked
+    // Disable all inputs initially
+    disableSectionInputs('fibonacciSection');
+    disableSectionInputs('tshirtSection');
+    disableSectionInputs('customSection');
+
+    // Show the selected section and enable its inputs
     if (type === 'fibonacci') {
       document.getElementById('fibonacciSection').style.display = 'block';
+      enableSectionInputs('fibonacciSection');
     } else if (type === 'tshirt') {
       document.getElementById('tshirtSection').style.display = 'block';
+      enableSectionInputs('tshirtSection');
     } else if (type === 'custom') {
       document.getElementById('customSection').style.display = 'block';
+      enableSectionInputs('customSection');
     }
   }
 
-  //Fibonacci section is shown by default on page load
-  window.onload = function() {
-    showType('fibonacci');
-  };
-
-  function goToAction(url) {
-      window.location.href = url;
+  /**
+   * Function to disable all input fields within a specified section.
+   * @param {string} sectionId - The ID of the section to disable.
+   */
+  function disableSectionInputs(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      const inputs = section.querySelectorAll('input');
+      inputs.forEach(input => input.disabled = true);
+    }
   }
+
+  /**
+   * Function to enable all input fields within a specified section.
+   * @param {string} sectionId - The ID of the section to enable.
+   */
+  function enableSectionInputs(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      const inputs = section.querySelectorAll('input');
+      inputs.forEach(input => input.disabled = false);
+    }
+  }
+
+  /**
+   * Function to navigate to a specified URL.
+   * @param {string} url - The URL to navigate to.
+   */
+  function goToAction(url) {
+    alert('Redirecting to: ' + url); // Debugging: Display the URL
+    window.location.href = url;
+  }
+
+  // Initialize the form based on lastType on page load
+  window.onload = function() {
+    // Retrieve lastType from EJS variable and set the vote type accordingly
+    const lastType = '<%= lastType || "fibonacci" %>';
+    setVoteType(lastType);
+  };
 </script>
 
 <%- include('partials/footer') %>
