@@ -59,3 +59,29 @@ input[type="radio"] {
     font-weight: bold;
     color: aqua !important;
 }
+
+.dashboardListGroup{
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+}
+
+.dashboardList{
+    padding: 1rem;
+    list-style-type: none;
+    border: 1px solid #222222;
+    background-color: #222222;
+    border-radius: 6px;
+}
+
+.controlPanelCodeBox{
+    background-color: #222222 !important;
+}
+
+.controlPanelCodeBox .card-title{
+    color: aqua !important;
+}
+
+
+
+
+

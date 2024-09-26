@@ -58,11 +58,13 @@ const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
 const organizerRouter = require('./routes/organizer');
 const questionsRouter = require('./routes/questions');
+const controlPanelRouter = require('./routes/controlPanel')
 
 app.use('/', indexRouter);
 app.use('/auth', authRouter);
 app.use('/organizer', organizerRouter);
 app.use('/organizer', questionsRouter);
+app.use('/organizer', controlPanelRouter);
 
 // Start Server
 const PORT = process.env.PORT || 3000;

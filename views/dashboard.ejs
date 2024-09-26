@@ -11,20 +11,20 @@
   <div class="my-5">
     <h3>Your Vote Collections</h3>
     <% if (voteSession.length > 0) { %>
-      <ul class="list-group">
+      <ul class="dashboardListGroup">
         <% voteSession.forEach(voteSession => { %>
+          <li class="dashboardList">
+            <strong class="voteCollectionText"><%= voteSession.title %></strong>      
+            <div class="text-muted"><i class="fa-regular fa-clock"></i> <%= voteSession.dateCreated.toDateString() %></div>
 
-
-          <% if(voteSession.voteSessionSubmitted == null || voteSession.voteSessionSubmitted == 'no') { %>
-            <h5>"VoteSessionSubmitted = no"</h5>
-          <% } %>
-
-
-
-
-          <li class="list-group-item bg-dark">
-            <strong class="voteCollectionText"><%= voteSession.title %></strong> <span class="text-muted">(<%= voteSession.dateCreated.toDateString() %>)</span>
+            <div class="text-right">
+              <a href="/organizer/dashboard/controlPanel/<%= voteSession._id %>" class="btn btn-sm btn-outline-warning"><i class="fa-regular fa-circle-play"></i></a> 
+              <a href="#" class="btn btn-sm btn-outline-warning"><i class="fa-regular fa-eye"></i></a> 
+              <a href="/organizer/dashboard/delete/<%= voteSession._id %>" class="btn btn-sm btn-outline-warning"><i class="fa-regular fa-trash-can"></i></a> 
+              
+            </div>
           </li>
+          <br>
         <% }) %>
       </ul>
     <% } else { %>
@@ -34,3 +34,6 @@
 </div>
 </div>
 <%- include('partials/footer') %>
+
+
+

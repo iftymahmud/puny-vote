@@ -46,9 +46,6 @@ router.get('/create-questions/:voteSessionId', ensureAuthenticated, async (req,r
     addOption(o5);
     addOption(o6);
 
-
-    console.log(req.body);
-
     try {
       let voteSession = await VoteSession.findOne({_id: voteSessionId, organizer: req.session.userId})
 
