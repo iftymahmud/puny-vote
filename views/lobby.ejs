@@ -1,0 +1,30 @@
+<!-- views/lobby.ejs -->
+<%- include('partials/header') %>
+<div class="container mt-5">
+  <div class="signBox">
+  <h2>Lobby</h2>
+  <h4 class="text-warning"><i class="fa-solid fa-square-poll-vertical"></i> <%= voteSession.title %></h4>
+
+
+  <div class="my-5">
+    <h3>Participants (<strong class="text-warning"><%= voteSession.participants.length %></strong>)</h3>
+    <% if (voteSession.participants.length > 0) { %>
+      <ul class="dashboardListGroup">
+        <% voteSession.participants.forEach(participant => { %>
+            <div class="btn btn-lg btn-outline-warning mb-1 text-white">
+                <%= participant.name %> 
+                <%= participant.emoji %> 
+            </div>
+            
+        <% }) %>
+      </ul>
+    <% } else { %>
+      <p>No Participants Have Joined Yet</p>
+    <% } %>
+  </div>
+</div>
+</div>
+<%- include('partials/footer') %>
+
+
+

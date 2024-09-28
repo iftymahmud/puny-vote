@@ -37,16 +37,42 @@ router.get('/join/:voteSessionCode', async (req, res) => {
 // POST name Page
 router.post('/join/:voteSessionCode', async (req, res) => {
   try {
+
     const code = req.params.voteSessionCode;
     const voteSession = await VoteSession.findOne({ code: code });
     
-    console.log(voteSession);
-    console.log(req.body);
+    let name = req.body.name;
+    let emoji = req.body.emoji;
+    if(emoji==''){
+      emoji='😀';
+    }
 
-    // res.render('join', );
+    voteSession.participants.push({
+      name: name,
+      emoji: emoji,
+    });
+
+    await voteSession.save()
+    res.redirect(`/lobby/${code}`);
   } catch (error) {
     console.error(error);
     res.render('home', { error: 'An error occurred. Please try again.' });
+  }
+});
+
+
+
+
+// GET Lobby Page
+router.get('/lobby/:voteSessionCode', async (req, res) => {
+  try {
+    const code = req.params.voteSessionCode;
+    const voteSession = await VoteSession.findOne({ code: code });
+    
+    res.render('lobby', {voteSession: voteSession});
+  } catch (error) {
+    console.error(error);
+    res.render('join', { error: 'An error occurred. Please try again.' });
   }
 });
 
