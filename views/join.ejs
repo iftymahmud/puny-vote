@@ -1,0 +1,62 @@
+<!-- views/join.ejs -->
+
+<%- include('partials/header') %>
+
+<div class="container mt-5">
+  <div class="signBox">
+    <h2>Choose Alias + <span class="text-warning">Emoji</span></h2>
+
+    <form action="/join/<%= code %>" method="POST">
+      <div class="row mt-3">
+        <div class="col-md-6 form-group">
+          <!-- <label>Your Name</label> -->
+          <input id="name-input" type="text" name="name" class="form-control" placeholder="Type name" required />
+        </div>
+
+        <div class="col-md-6 form-group">
+          <!-- <label>Choose an Emoji</label> -->
+          <div id="emoji-input" class="emojiDisplay form-control" style="cursor: pointer;">😀</div>
+          <input type="hidden" name="emoji" id="hidden-emoji-input" required />
+        </div>
+      </div>
+
+      <div id="emoji-container" style="display:none; position: absolute; z-index: 10;">
+        <emoji-picker id="emoji-picker"></emoji-picker>
+      </div>
+
+      <button type="submit" class="btn btn-dark mt-3">Go to Lobby</button>
+    </form>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
+
+<!-- Import emoji-picker-element -->
+<script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
+
+<script type="module">
+  const emojiPicker = document.querySelector('#emoji-picker');
+  const emojiInput = document.querySelector('#emoji-input');
+  const hiddenEmojiInput = document.querySelector('#hidden-emoji-input');
+  const emojiContainer = document.querySelector('#emoji-container');
+
+  emojiInput.addEventListener('click', () => {
+    emojiContainer.style.display = emojiContainer.style.display === 'none' ? 'block' : 'none';
+    const rect = emojiInput.getBoundingClientRect();
+    emojiContainer.style.top = `${rect.bottom + window.scrollY}px`;
+    emojiContainer.style.left = `${rect.left + window.scrollX}px`;
+  });
+
+  emojiPicker.addEventListener('emoji-click', (event) => {
+    const selectedEmoji = event.detail.unicode;
+    emojiInput.textContent = selectedEmoji;
+    hiddenEmojiInput.value = selectedEmoji;
+    emojiContainer.style.display = 'none';
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!emojiContainer.contains(event.target) && !emojiInput.contains(event.target)) {
+      emojiContainer.style.display = 'none';
+    }
+  });
+</script>

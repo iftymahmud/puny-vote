@@ -82,6 +82,23 @@ input[type="radio"] {
 }
 
 
+.emojiInputGroup{
+    width: 6rem !important; /* Set the width */
+}
+
+#emoji-input{
+    font-size: x-large !important;
+    width: 5rem;
+    text-align: center !important; 
+}
+
+#name-input{
+    font-size: x-large !important;
+}
+
+
+
+
 
 
 
