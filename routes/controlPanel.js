@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const { ensureAuthenticated } = require('../middleware/auth');
 const VoteSession = require('../models/VoteSession');
+const Participant = require('../models/Participant');
 
 // GET method to Delete Dashboard Vote List
 router.get('/dashboard/delete/:voteSessionId', ensureAuthenticated, async (req, res) => {
@@ -10,9 +11,13 @@ router.get('/dashboard/delete/:voteSessionId', ensureAuthenticated, async (req, 
 
     const voteSessionId = req.params.voteSessionId;
 
-    await VoteSession.findOneAndDelete({
+    const deletedVoteSession = await VoteSession.findOneAndDelete({
       _id: voteSessionId,
       organizer: req.session.userId
+    });
+
+    await Participant.deleteMany({
+      code: deletedVoteSession.code
     });
   
     const voteSession = await VoteSession.find({ organizer: req.session.userId });

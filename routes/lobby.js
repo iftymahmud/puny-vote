@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const VoteSession = require('../models/VoteSession');
+const Participant = require('../models/Participant');
 
 // POST Home Page
 router.post('/', async (req, res) => {
@@ -25,7 +26,6 @@ router.get('/join/:voteSessionCode', async (req, res) => {
     if (!voteSession) {
         return res.render('home', { error: 'Please try a valid session code' });
       }
-
     res.render('join', {code: code});
   } catch (error) {
     console.error(error);
@@ -39,20 +39,25 @@ router.post('/join/:voteSessionCode', async (req, res) => {
   try {
 
     const code = req.params.voteSessionCode;
-    const voteSession = await VoteSession.findOne({ code: code });
+
+    await Participant.deleteOne({
+      _id: req.session.userId
+    });
     
     let name = req.body.name;
     let emoji = req.body.emoji;
     if(emoji==''){
       emoji='😀';
     }
-
-    voteSession.participants.push({
+    const participant = new Participant({
       name: name,
       emoji: emoji,
+      code: code,
     });
+    await participant.save()
 
-    await voteSession.save()
+    req.session.userId = participant._id;
+
     res.redirect(`/lobby/${code}`);
   } catch (error) {
     console.error(error);
@@ -68,8 +73,9 @@ router.get('/lobby/:voteSessionCode', async (req, res) => {
   try {
     const code = req.params.voteSessionCode;
     const voteSession = await VoteSession.findOne({ code: code });
+    const participant = await Participant.find({ code: code });
     
-    res.render('lobby', {voteSession: voteSession});
+    res.render('lobby', {voteSession: voteSession, participant: participant});
   } catch (error) {
     console.error(error);
     res.render('join', { error: 'An error occurred. Please try again.' });

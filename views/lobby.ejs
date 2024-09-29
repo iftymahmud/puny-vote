@@ -7,13 +7,13 @@
 
 
   <div class="my-5">
-    <h3>Participants (<strong class="text-warning"><%= voteSession.participants.length %></strong>)</h3>
-    <% if (voteSession.participants.length > 0) { %>
+    <h3>Participants (<strong class="text-warning"><%= participant.length || 0%></strong>)</h3>
+    <% if (participant.length > 0) { %>
       <ul class="dashboardListGroup">
-        <% voteSession.participants.forEach(participant => { %>
+        <% participant.forEach(participantEach => { %>
             <div class="btn btn-lg btn-outline-warning mb-1 text-white">
-                <%= participant.name %> 
-                <%= participant.emoji %> 
+                <%= participantEach.name %> 
+                <%= participantEach.emoji %> 
             </div>
             
         <% }) %>
