@@ -1,0 +1,60 @@
+<!-- views/questionPanel.ejs -->
+<%- include('partials/header') %>
+<div class="container mt-5">
+  <div class="signBox">
+  <h4 class="text-warning"><i class="fa-solid fa-square-poll-vertical"></i> <%= voteSession.title %></h4>
+
+
+  <div class="card mt-5 bg-dark controlPanelCodeBox" style="width: 40rem;">
+    <div class="card-body">
+      <% if (voteSession && voteSession.questions.length > 0) { %>
+        <% const currentQuestion = voteSession.questions[voteSession.voteFlag]; %>
+        
+        <!-- Display question number and text -->
+        <h4 class="card-title">
+          <span class="text-warning">Question <%= currentQuestion.questionNumber %>:</span> <%= currentQuestion.questionText %>
+        </h4>
+  
+        <!-- Display options as non-clickable dark buttons -->
+        <h5 class="card-text">
+          <span class="text-light">
+            <form action="/organizer/dashboard/questionPanel/<%= voteSession._id %>" method="POST">
+              <div class="btn-group-vertical w-100">
+                <% currentQuestion.options.forEach(function(option, index) { %>
+                  <div class="btn btn-outline-light w-100 mb-2" id="option<%= index %>" style="pointer-events: none; text-align: left;">
+                    <%= option %>
+                  </div>
+                <% }); %>
+              </div>
+              <button type="submit" class="btn btn-outline-warning mt-3 w-50">Next</button>
+            </form>
+          </span>
+        </h5>
+      <% } else { %>
+        <h4 class="card-title">No questions available</h4>
+      <% } %>
+    </div>
+  </div>
+  
+  
+  
+  
+
+    
+
+
+
+
+
+
+
+  </div>
+</div>
+
+
+
+
+
+
+
+<%- include('partials/footer') %>

@@ -41,7 +41,9 @@ router.get('/dashboard/controlPanel/:voteSessionId', ensureAuthenticated, async 
       organizer: req.session.userId,
     });
 
-    
+    voteSession.voteFlag = -1;
+    await voteSession.save();
+
     res.render('controlPanel', { voteSession });
   } catch (error) {
     console.error(error);
@@ -49,6 +51,99 @@ router.get('/dashboard/controlPanel/:voteSessionId', ensureAuthenticated, async 
   }
 });
 
+
+
+
+// POST method on Control Panel
+router.post('/dashboard/controlPanel/:voteSessionId', ensureAuthenticated, async (req, res) => {
+  try {
+    const voteSessionId = req.params.voteSessionId;
+
+    res.redirect(`/dashboard/controlPanel/${voteSessionId}`);
+  } catch (error) {
+    console.error(error);
+    res.render('controlPanel', { voteSession: [] });
+  }
+});
+
+// GET method on Question Panel
+router.get('/dashboard/questionPanel/:voteSessionId', ensureAuthenticated, async (req, res) => {
+  try {
+    const voteSessionId = req.params.voteSessionId;
+    const voteSession = await VoteSession.findOne({
+      _id: voteSessionId,
+      organizer: req.session.userId,
+    });
+
+    res.render('questionPanel', { voteSession });
+  } catch (error) {
+    console.error(error);
+    res.render('controlPanel', { voteSession: [] });
+  }
+});
+
+
+// POST method on Question Panel
+router.post('/dashboard/questionPanel/:voteSessionId', ensureAuthenticated, async (req, res) => {
+  try {
+    const voteSessionId = req.params.voteSessionId;
+    const voteSession = await VoteSession.findOne({
+      _id: voteSessionId,
+      organizer: req.session.userId,
+    });
+
+    voteSession.voteFlag += 1;
+    await voteSession.save();
+
+    if (voteSession.voteFlag >= voteSession.questions.length) {
+      res.redirect(`/organizer/dashboard/questionPanelEnd/${voteSessionId}`);
+    } else {
+      res.redirect(`/organizer/dashboard/questionPanel/${voteSessionId}`);
+    }
+  } catch (error) {
+    console.error(error);
+    res.render('controlPanel', { voteSession: [] });
+  }
+});
+
+
+
+
+// GET method Question panel End
+router.get('/dashboard/questionPanelEnd/:voteSessionId', ensureAuthenticated, async (req, res) => {
+  try {
+    const voteSessionId = req.params.voteSessionId;
+    const voteSession = await VoteSession.findOne({
+      _id: voteSessionId,
+      organizer: req.session.userId,
+    });
+
+    voteSession.voteFlag = -1;
+    await voteSession.save();
+
+    res.render('questionPanelEnd', { voteSession });
+  } catch (error) {
+    console.error(error);
+    res.render('controlPanel', { voteSession: [] });
+  }
+});
+
+
+// GET method on Question Preview
+router.get('/dashboard/questionPreview/:voteSessionId', ensureAuthenticated, async (req, res) => {
+  try {
+    const voteSessionId = req.params.voteSessionId;
+    const voteSession = await VoteSession.findOne({
+      _id: voteSessionId,
+      organizer: req.session.userId,
+    });
+
+    res.render('questionPreview', { voteSession });
+  } catch (error) {
+    console.error(error);
+    res.render('dashboard', { voteSession: [] });
+  }
+});
 
 
 

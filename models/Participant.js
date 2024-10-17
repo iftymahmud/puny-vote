@@ -1,4 +1,4 @@
-// models/User.js
+// models/Participant.js
 const mongoose = require('mongoose');
 
 const ParticipantSchema = new mongoose.Schema({

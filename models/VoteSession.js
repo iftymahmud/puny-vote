@@ -1,4 +1,4 @@
-// models/Session.js
+// models/VoteSession.js
 const mongoose = require('mongoose');
 
 
@@ -18,6 +18,7 @@ const VoteSessionSchema = new mongoose.Schema({
   dateCreated: { type: Date, default: Date.now },
   questions: [QuestionSchema],
   voteSessionSubmitted: { type: String, enum: ['yes', 'no'], default: 'no' },
+  voteFlag: { type: Number, default: -1 },
 });
 
 module.exports = mongoose.model('VoteSession', VoteSessionSchema);
