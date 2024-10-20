@@ -1,78 +1,64 @@
 <%- include('partials/header') %>
 <div class="container mt-5">
   <div class="signBox">
-    <h4 class="text-warning"><i class="fa-solid fa-square-poll-vertical"></i> <%= voteSession.title %></h4>
+  <h4 class="text-warning"><i class="fa-solid fa-square-poll-vertical"></i> <%= voteSession.title %></h4>
 
-    <div class="card mt-5 bg-dark controlPanelCodeBox" style="width: 40rem;">
-      <div class="card-body">
-        <% if (voteSession && voteSession.questions.length > 0) { %>
-          <% const currentQuestion = voteSession.questions[voteSession.voteFlag]; %>
 
-          <!-- Display question number and text -->
-          <h4 class="card-title">
-            <span class="text-warning">Question <%= currentQuestion.questionNumber %>:</span> <%= currentQuestion.questionText %>
-          </h4>
-
-          <!-- Display options as clickable radio buttons styled as buttons -->
-          <h5 class="card-text">
-            <span class="text-light">
-              <form id="questionForm" action="/takevote/<%= voteSession.code %>" method="POST">
-                <div class="btn-group-vertical w-100" data-toggle="buttons">
-                  <% currentQuestion.options.forEach(function(option, index) { %>
-                    <label class="btn btn-outline-light w-100 mb-2" style="text-align: left;">
-                      <input type="radio" name="selectedOption" id="option<%= index %>" value="<%= option %>" autocomplete="off" required>
-                      <%= option %>
-                    </label>
-                  <% }); %>
-                </div>
-                <button type="submit" class="btn btn-outline-warning mt-3 w-50">Submit</button>
-              </form>
-            </span>
-          </h5>
-        <% } else { %>
-          <h4 class="card-title">No questions available</h4>
-        <% } %>
-      </div>
+  <div class="card mt-5 bg-dark controlPanelCodeBox" style="width: 40rem;">
+    <div class="card-body">
+      <% if (voteSession && voteSession.questions.length > 0) { %>
+        <% const currentQuestion = voteSession.questions[voteSession.voteFlag]; %>
+  
+        <!-- Display question number and text -->
+        <h4 class="card-title">
+          <span class="text-warning">Question <%= currentQuestion.questionNumber %>:</span> <%= currentQuestion.questionText %>
+        </h4>
+  
+        <!-- Display options as clickable radio buttons styled as buttons -->
+        <h5 class="card-text">
+          <span class="text-light">
+            <form action="/takevote/<%= voteSession.code %>" method="POST">
+              <div class="btn-group-vertical w-100" data-toggle="buttons">
+                <% currentQuestion.options.forEach(function(option, index) { %>
+                  <label class="btn btn-outline-light w-100 mb-2" style="text-align: left;">
+                    <input type="radio" name="selectedOption" id="option<%= index %>" value="<%= option %>" autocomplete="off" required>
+                    <%= option %>
+                  </label>
+                <% }); %>
+              </div>
+              <button type="submit" class="btn btn-outline-warning mt-3 w-50">Submit</button>
+            </form>
+          </span>
+        </h5>
+      <% } else { %>
+        <h4 class="card-title">No questions available</h4>
+      <% } %>
     </div>
-
-    <script>
-      // Add event listeners to toggle the 'active' class on radio button click
-      document.querySelectorAll('input[type="radio"]').forEach(function(radio) {
-        radio.addEventListener('change', function() {
-          document.querySelectorAll('label.btn').forEach(function(label) {
-            label.classList.remove('active');
-          });
-          if (radio.checked) {
-            radio.closest('label').classList.add('active');
-          }
-        });
+  </div>
+  
+  <script>
+  // Add event listeners to toggle the 'active' class on radio button click
+  document.querySelectorAll('input[type="radio"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      document.querySelectorAll('label.btn').forEach(function(label) {
+        label.classList.remove('active');
       });
+      if (radio.checked) {
+        radio.closest('label').classList.add('active');
+      }
+    });
+  });
+  </script>
 
-      // Auto-refresh after form submission
-      const form = document.getElementById('questionForm');
-      form.addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent the default form submission
-
-        // Perform the form submission via JavaScript
-        const formData = new FormData(form);
-        fetch(form.action, {
-          method: form.method,
-          body: formData,
-        })
-        .then(response => {
-          // Check if form submission was successful
-          if (response.ok) {
-            setTimeout(function() {
-              window.location.reload();
-            }, 1000);  // Refresh 1 second after form submission
-          } else {
-            console.error('Form submission failed');
-          }
-        })
-        .catch(error => console.error('Error during form submission:', error));
-      });
-    </script>
   </div>
 </div>
+
+<% if (submitFlag === 1) { %>
+  <script>
+    setTimeout(function() {
+        window.location.reload(1);
+    }, 1000);  // Refresh every 1 second (1000 ms)
+  </script>
+<% } %>
 
 <%- include('partials/footer') %>
