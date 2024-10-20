@@ -75,7 +75,40 @@ router.get('/dashboard/questionPanel/:voteSessionId', ensureAuthenticated, async
       organizer: req.session.userId,
     });
 
-    res.render('questionPanel', { voteSession });
+    const participants = await Participant.find({ 
+      'submissions.voteSession': voteSessionId 
+    });
+
+    const voteCounts = {};
+
+    voteSession.questions.forEach((question) => {
+      const questionNumber = question.questionNumber;
+      voteCounts[questionNumber] = {};  
+      
+      question.options.forEach((option) => {
+        voteCounts[questionNumber][option] = 0;  
+      });
+    });
+
+    participants.forEach((participant) => {
+      participant.submissions.forEach((submission) => {
+        if (submission.voteSession.toString() === voteSessionId) {
+          submission.votes.forEach((vote) => {
+            const questionNumber = vote.questionNumber;
+            const selectedOption = vote.selectedOption;
+            
+            if (voteCounts[questionNumber] && voteCounts[questionNumber][selectedOption] !== undefined) {
+              voteCounts[questionNumber][selectedOption] += 1;
+            }
+          });
+        }
+      });
+    });
+
+
+
+
+    res.render('questionPanel', { voteSession, voteCounts });
   } catch (error) {
     console.error(error);
     res.render('controlPanel', { voteSession: [] });

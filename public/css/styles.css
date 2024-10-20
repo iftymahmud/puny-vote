@@ -96,7 +96,16 @@ input[type="radio"] {
     font-size: x-large !important;
 }
 
-
+.option-container {
+    margin-bottom: 15px;
+  }
+  .option-text {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  .progress {
+    background-color: #EEEEEE;
+  }
 
 
 
