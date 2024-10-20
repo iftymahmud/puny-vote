@@ -60,13 +60,16 @@ const organizerRouter = require('./routes/organizer');
 const questionsRouter = require('./routes/questions');
 const controlPanelRouter = require('./routes/controlPanel')
 const lobby = require('./routes/lobby');
+const voteParticipantion = require('./routes/voteParticipation');
 
 app.use('/', indexRouter);
 app.use('/', lobby);
+app.use('/', voteParticipantion);
 app.use('/auth', authRouter);
 app.use('/organizer', organizerRouter);
 app.use('/organizer', questionsRouter);
 app.use('/organizer', controlPanelRouter);
+
 
 // Start Server
 const PORT = process.env.PORT || 3000;

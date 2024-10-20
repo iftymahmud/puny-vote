@@ -74,8 +74,12 @@ router.get('/lobby/:voteSessionCode', async (req, res) => {
     const code = req.params.voteSessionCode;
     const voteSession = await VoteSession.findOne({ code: code });
     const participant = await Participant.find({ code: code });
-    
-    res.render('lobby', {voteSession: voteSession, participant: participant});
+
+    if (voteSession.voteFlag > -1) {
+      res.redirect(`/takevote/${code}`);
+    } else {
+      res.render('lobby', {voteSession: voteSession, participant: participant});
+    }
   } catch (error) {
     console.error(error);
     res.render('join', { error: 'An error occurred. Please try again.' });
