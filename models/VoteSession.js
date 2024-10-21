@@ -19,6 +19,7 @@ const VoteSessionSchema = new mongoose.Schema({
   questions: [QuestionSchema],
   voteSessionSubmitted: { type: String, enum: ['yes', 'no'], default: 'no' },
   voteFlag: { type: Number, default: -1 },
+  token: { type: String, unique: true },
 });
 
 module.exports = mongoose.model('VoteSession', VoteSessionSchema);

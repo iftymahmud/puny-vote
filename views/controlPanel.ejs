@@ -21,13 +21,41 @@
     </div>
       
 
-      
+    <div class="my-5">
+      <h4>Participants (<strong class="text-warning"><%= participant.length || 0%></strong>)</h4>
+      <% if (participant.length > 0) { %>
+        <ul class="dashboardListGroup">
+          <% participant.forEach(participantEach => { %>
+              <div class="btn btn btn-outline-info mb-1 text-white">
+                  <%= participantEach.name %> 
+                  <%= participantEach.emoji %> 
+              </div>
+              
+          <% }) %>
+        </ul>
+      <% } else { %>
+        <p>No Participants Have Joined Yet</p>
+      <% } %>
+    </div>
 
 
 
 
     </div>
 </div>
+
+
+
+
+
+<script>
+  setTimeout(function() {
+      window.location.reload(1);
+  }, 2000);  // Refresh every 2 seconds (1000 ms)
+</script>
+
+
+
 <%- include('partials/footer') %>
 
 

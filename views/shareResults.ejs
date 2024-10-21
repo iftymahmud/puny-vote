@@ -1,0 +1,97 @@
+<%- include('partials/header') %>
+
+<div class="container my-5">
+  <div class="signBox">
+
+
+
+    <!-- Copy URL Button -->
+    <button id="copyUrlButton" class="btn btn-sm btn-outline-light mt-3" aria-label="Copy URL to clipboard">
+      <i class="fa-solid fa-link"></i> Copy Shareable Link
+    </button>
+
+    <br><br>
+
+    <h4 class="text-warning">
+      <i class="fa-solid fa-square-poll-vertical"></i> <%= voteSession.title %>
+    </h4>
+    <% if (voteSession && voteSession.questions.length > 0) { %>
+      <% voteSession.questions.forEach(function (question) { %>
+        <div class="card mt-3 bg-dark controlPanelCodeBox" style="width: 40rem;">
+          <div class="card-body">
+            <h5 class="card-title">
+              <span class="text-warning">Question <%= question.questionNumber %>:</span>
+              <%= question.questionText %>
+            </h5>
+            <% const questionVoteCounts = voteCounts[question.questionNumber] || {}; %>
+            <% let totalVotes = 0; %>
+            <% question.options.forEach(function (option) { %>
+              <% totalVotes += questionVoteCounts[option] || 0; %>
+            <% }); %>
+            <h5 class="card-text">
+              <span class="text-light">
+                <div class="w-100">
+                  <% question.options.forEach(function (option) { %>
+                    <% const count = questionVoteCounts[option] || 0; %>
+                    <% const percentage = totalVotes > 0 ? (count / totalVotes) * 100 : 0; %>
+                    <div class="option-container mb-2">
+                      <div class="option-text text-light small">
+                        <%= option %> (<span class="text-info"><%= count %> vote<%= count !== 1 ? 's' : '' %></span>)
+                      </div>
+                      <div class="progress">
+                        <div
+                          class="progress-bar bg-warning progress-bar-striped progress-bar-animated"
+                          role="progressbar"
+                          style="width: <%= percentage %>%;"
+                          aria-valuenow="<%= percentage %>"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        ></div>
+                      </div>
+                    </div>
+                  <% }); %>
+                </div>
+              </span>
+            </h5>
+          </div>
+        </div>
+      <% }); %>
+
+
+
+
+    <% } else { %>
+      <h4 class="card-title">Nothing to share</h4>
+    <% } %>
+  </div>
+</div>
+
+<!-- JavaScript to handle the copy functionality -->
+<script>
+  document.getElementById('copyUrlButton').addEventListener('click', function () {
+    var button = this;
+    var originalHTML = button.innerHTML;
+    var originalClass = button.className;
+
+    navigator.clipboard.writeText(window.location.href).then(
+      function () {
+        // Change button text and style on success
+        button.innerHTML = '<i class="fa-solid fa-check"></i> Copied';
+        button.className = 'btn btn-sm btn-light mt-3';
+        button.disabled = true;
+
+        // Revert back after 2 seconds
+        setTimeout(function () {
+          button.innerHTML = originalHTML;
+          button.className = originalClass;
+          button.disabled = false;
+        }, 2000);
+      },
+      function (err) {
+        // Silently handle errors (no alerts)
+      }
+    );
+  });
+</script>
+
+<%- include('partials/footer') %>

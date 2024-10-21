@@ -7,6 +7,11 @@
 
   <h1 class="text-light"><i class="fa-solid fa-flag-checkered"></i> End of the Vote</h1>
 
+
+  <form action="/share/<%= voteSession.code %>" method="POST">
+    <button type="submit" class="btn btn-info">See Complete Results</button>
+  </form>
+
   <br><br>
 
   <a href="/organizer/dashboard" class="btn btn-outline-warning">Go To Dashboard</a>

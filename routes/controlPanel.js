@@ -40,11 +40,12 @@ router.get('/dashboard/controlPanel/:voteSessionId', ensureAuthenticated, async 
       _id: voteSessionId,
       organizer: req.session.userId,
     });
+    const participant = await Participant.find({ code: voteSession.code });
 
     voteSession.voteFlag = -1;
     await voteSession.save();
 
-    res.render('controlPanel', { voteSession });
+    res.render('controlPanel', { voteSession, participant });
   } catch (error) {
     console.error(error);
     res.render('dashboard', { voteSession: [] });
