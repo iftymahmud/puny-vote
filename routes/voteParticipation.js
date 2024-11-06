@@ -1,4 +1,4 @@
-// routes/voteParticipantion.js
+// routes/voteParticipation.js
 const express = require('express');
 const router = express.Router();
 const VoteSession = require('../models/VoteSession');
@@ -66,6 +66,12 @@ router.post('/takevote/:voteSessionCode', async (req, res) => {
   
       submission.votes.push(newVote); 
       await participant.save();
+
+      // Emit event to update votes
+      req.io.to(`session_${code}`).emit('voteSubmitted', {
+        questionNumber: currentQuestion.questionNumber,
+        selectedOption,
+      });
       
     res.redirect(`/takevote/${voteSession.code}`);
     } catch (error) {

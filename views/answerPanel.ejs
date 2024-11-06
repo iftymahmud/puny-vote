@@ -26,7 +26,11 @@
                   </label>
                 <% }); %>
               </div>
-              <button type="submit" class="btn btn-outline-warning mt-3 w-50">Submit</button>
+              <% if (!submitFlag) { %>
+                <button type="submit" class="btn btn-outline-warning mt-3 w-50">Submit</button>
+              <% } else { %>
+                <button type="button" class="btn btn-warning mt-3 w-50" disabled>Submitted</button>
+              <% } %>
             </form>
           </span>
         </h5>
@@ -35,6 +39,8 @@
       <% } %>
     </div>
   </div>
+</div>
+</div>
   
   <script>
   // Add event listeners to toggle the 'active' class on radio button click
@@ -50,15 +56,27 @@
   });
   </script>
 
-  </div>
-</div>
 
-<% if (submitFlag === 1) { %>
-  <script>
-    setTimeout(function() {
-        window.location.reload(1);
-    }, 1000);  // Refresh every 1 second (1000 ms)
-  </script>
-<% } %>
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+  
+  // Join the session room
+  socket.emit('joinRoom', { room: 'session_<%= voteSession.code %>' });
+
+  // Listen for next question
+  socket.on('nextQuestion', (data) => {
+    window.location.reload();
+    });
+
+    // Listen for voteEnd
+  socket.on('voteEnd', (data) => {
+    window.location.reload();
+    });
+</script>
+
+
 
 <%- include('partials/footer') %>

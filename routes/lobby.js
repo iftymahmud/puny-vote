@@ -58,6 +58,13 @@ router.post('/join/:voteSessionCode', async (req, res) => {
 
     req.session.userId = participant._id;
 
+    // Emit event to update participant list
+    req.io.to(`session_${code}`).emit('participantJoined', {
+      name: participant.name,
+      emoji: participant.emoji,
+      code: participant.code,
+  });
+
     res.redirect(`/lobby/${code}`);
   } catch (error) {
     console.error(error);

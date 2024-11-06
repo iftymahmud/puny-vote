@@ -45,6 +45,12 @@ router.get('/dashboard/controlPanel/:voteSessionId', ensureAuthenticated, async 
     voteSession.voteFlag = -1;
     await voteSession.save();
 
+    // Join the Socket.IO room
+    const voteSessionCode = voteSession.code;
+    req.io.on('connection', (socket) => {
+      socket.join(`session_${voteSessionCode}`);
+    });
+
     res.render('controlPanel', { voteSession, participant });
   } catch (error) {
     console.error(error);
@@ -121,22 +127,57 @@ router.get('/dashboard/questionPanel/:voteSessionId', ensureAuthenticated, async
 router.post('/dashboard/questionPanel/:voteSessionId', ensureAuthenticated, async (req, res) => {
   try {
     const voteSessionId = req.params.voteSessionId;
+
+    // Fetch the VoteSession document
     const voteSession = await VoteSession.findOne({
       _id: voteSessionId,
       organizer: req.session.userId,
     });
 
+    if (!voteSession) {
+      throw new Error('VoteSession not found');
+    }
+
+    // Increment the voteFlag to move to the next question
     voteSession.voteFlag += 1;
     await voteSession.save();
 
+    // Determine if the vote has just started
+    if (voteSession.voteFlag === 0) {
+      // Emit 'voteStarted' event to all participants in the session room
+      req.io.to(`session_${voteSession.code}`).emit('voteStarted', {
+        voteSessionId: voteSession._id,
+        code: voteSession.code,
+      });
+    }
+
+    // 'voteStarted' event for lobby
+    if (voteSession.voteFlag == 0) {
+      req.io.to(`session_${voteSession.code}`).emit('voteStarted', {
+        voteFlag: voteSession.voteFlag,
+        questionNumber: voteSession.questions[voteSession.voteFlag].questionNumber,
+      });
+    }
+
+    // Optionally, emit 'nextQuestion' event for subsequent questions
+    if (voteSession.voteFlag > 0 && voteSession.voteFlag < voteSession.questions.length) {
+      req.io.to(`session_${voteSession.code}`).emit('nextQuestion', {
+        voteFlag: voteSession.voteFlag,
+        questionNumber: voteSession.questions[voteSession.voteFlag].questionNumber,
+      });
+    }
+
+    // Redirect to the appropriate page based on voteFlag and emit
     if (voteSession.voteFlag >= voteSession.questions.length) {
+      req.io.to(`session_${voteSession.code}`).emit('voteEnd');
+
       res.redirect(`/organizer/dashboard/questionPanelEnd/${voteSessionId}`);
     } else {
       res.redirect(`/organizer/dashboard/questionPanel/${voteSessionId}`);
     }
   } catch (error) {
     console.error(error);
-    res.render('controlPanel', { voteSession: [] });
+    res.render('controlPanel', { voteSession: [], error: 'An error occurred while starting the vote.' });
   }
 });
 

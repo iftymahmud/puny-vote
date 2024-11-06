@@ -2,45 +2,63 @@
 <%- include('partials/header') %>
 <div class="container mt-5">
   <div class="signBox">
-  <h2>Lobby</h2>
-  <h4 class="text-warning"><i class="fa-solid fa-square-poll-vertical"></i> <%= voteSession.title %></h4>
+    <h2>Lobby</h2>
+    <h4 class="text-warning"><i class="fa-solid fa-square-poll-vertical"></i> <%= voteSession.title %></h4>
 
-
-  <div class="my-5">
-    <h3>Participants (<strong class="text-warning"><%= participant.length || 0%></strong>)</h3>
-    <% if (participant.length > 0) { %>
-      <ul class="dashboardListGroup">
-        <% participant.forEach(participantEach => { %>
-            <div class="btn btn-lg btn-outline-warning mb-1 text-white">
-                <%= participantEach.name %> 
-                <%= participantEach.emoji %> 
-            </div>
-            
-        <% }) %>
-      </ul>
-    <% } else { %>
-      <p>No Participants Have Joined Yet</p>
-    <% } %>
+    <div class="my-5">
+      <h3>Participants (<strong class="text-warning" id="participantCount"><%= participant.length || 0%></strong>)</h3>
+      <div id="participantList">
+        <% if (participant.length > 0) { %>
+          <ul class="dashboardListGroup">
+            <% participant.forEach(participantEach => { %>
+              <div class="btn btn-lg btn-outline-warning mb-1 text-white">
+                <%= participantEach.name %>
+                <%= participantEach.emoji %>
+              </div>
+            <% }) %>
+          </ul>
+        <% } else { %>
+          <p>No Participants Have Joined Yet</p>
+        <% } %>
+      </div>
+    </div>
   </div>
 </div>
-</div>
 
-
+<script src="/socket.io/socket.io.js"></script>
 <script>
-  setTimeout(function() {
-      window.location.reload(1);
-  }, 1000);  // Refresh every 1 seconds (1000 ms)
+  const socket = io();
+  // Join the session room
+  socket.emit('joinRoom', { room: 'session_<%= voteSession.code %>' });
+
+  // Listen for participantJoined event
+  socket.on('participantJoined', (data) => {
+    // Update participant count
+    const participantCountElement = document.getElementById('participantCount');
+    let count = parseInt(participantCountElement.innerText) + 1;
+    participantCountElement.innerText = count;
+
+    // Add new participant to the list
+    const participantList = document.getElementById('participantList');
+    const newParticipant = document.createElement('span');
+    newParticipant.className = 'btn btn-lg btn-outline-warning mb-1 text-white';
+    newParticipant.innerText = `${data.name} ${data.emoji}`;
+    participantList.appendChild(newParticipant);
+  });
+
+  // Listen for Vote Session Start
+  socket.on('voteStarted', (data) => {
+    window.location.reload();
+  });
+
+
+
+
+
 </script>
 
-
-
-
-
-
-
-
-
 <%- include('partials/footer') %>
+
 
 
 

@@ -5,8 +5,13 @@ const path = require('path');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
+const http = require('http'); // Import the http module
+const socketIO = require('socket.io'); // Import socket.io
+const sharedsession = require('express-socket.io-session'); // For sharing sessions
 
 const app = express();
+const server = http.createServer(app); // Create an HTTP server
+const io = socketIO(server); // Attach socket.io to the server
 
 // Database Connection
 mongoose.connect(process.env.MONGODB_URI, {
@@ -26,16 +31,21 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Session Middleware
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
-  })
-);
+const sessionMiddleware = session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
+});
 
-//Middleware
+app.use(sessionMiddleware);
+
+// Share session with Socket.IO
+io.use(sharedsession(sessionMiddleware, {
+  autoSave: true,
+}));
+
+// Middleware to set res.locals.user
 app.use(async (req, res, next) => {
   res.locals.user = null;
   if (req.session.userId) {
@@ -47,6 +57,14 @@ app.use(async (req, res, next) => {
       console.error(error);
     }
   }
+  // Debugging: Log the user
+  console.log('res.locals.user:', res.locals.user);
+  next();
+});
+
+// Middleware to make io accessible in routes
+app.use((req, res, next) => {
+  req.io = io;
   next();
 });
 
@@ -58,21 +76,36 @@ const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
 const organizerRouter = require('./routes/organizer');
 const questionsRouter = require('./routes/questions');
-const controlPanelRouter = require('./routes/controlPanel')
-const lobby = require('./routes/lobby');
-const voteParticipantion = require('./routes/voteParticipation');
+const controlPanelRouter = require('./routes/controlPanel');
+const lobbyRouter = require('./routes/lobby');
+const voteParticipationRouter = require('./routes/voteParticipation');
 
 app.use('/', indexRouter);
-app.use('/', lobby);
-app.use('/', voteParticipantion);
+app.use('/', lobbyRouter);
+app.use('/', voteParticipationRouter);
 app.use('/auth', authRouter);
 app.use('/organizer', organizerRouter);
 app.use('/organizer', questionsRouter);
 app.use('/organizer', controlPanelRouter);
 
+// Socket.IO connection handler
+io.on('connection', (socket) => {
+  console.log('A user connected');
+
+  // Handle joining rooms
+  socket.on('joinRoom', (data) => {
+    socket.join(data.room);
+    console.log(`User joined room: ${data.room}`);
+  });
+
+  // Handle disconnects
+  socket.on('disconnect', () => {
+    console.log('A user disconnected');
+  });
+});
 
 // Start Server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

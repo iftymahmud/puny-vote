@@ -21,42 +21,49 @@
     </div>
       
 
-    <div class="my-5">
-      <h4>Participants (<strong class="text-warning"><%= participant.length || 0%></strong>)</h4>
-      <% if (participant.length > 0) { %>
-        <ul class="dashboardListGroup">
-          <% participant.forEach(participantEach => { %>
-              <div class="btn btn btn-outline-info mb-1 text-white">
-                  <%= participantEach.name %> 
-                  <%= participantEach.emoji %> 
-              </div>
-              
-          <% }) %>
-        </ul>
-      <% } else { %>
-        <p>No Participants Have Joined Yet</p>
-      <% } %>
-    </div>
 
-
-
-
-    </div>
+<div class="my-5">
+  <h4>Participants (<strong class="text-warning" id="participantCount"><%= participant.length || 0%></strong>)</h4>
+  <div id="participantList">
+    <% if (participant.length > 0) { %>
+      <ul class="dashboardListGroup">
+        <% participant.forEach(participantEach => { %>
+          <div class="btn btn btn-outline-info mb-1 text-white">
+            <%= participantEach.name %>
+            <%= participantEach.emoji %>
+          </div>
+        <% }) %>
+      </ul>
+    <% } else { %>
+      <p>No Participants Have Joined Yet</p>
+    <% } %>
+  </div>
 </div>
 
-
-
-
-
+<script src="/socket.io/socket.io.js"></script>
 <script>
-  setTimeout(function() {
-      window.location.reload(1);
-  }, 2000);  // Refresh every 2 seconds (1000 ms)
+  const socket = io();
+  // Join the session room
+  socket.emit('joinRoom', { room: 'session_<%= voteSession.code %>' });
+
+  // Listen for participantJoined event
+  socket.on('participantJoined', (data) => {
+    // Update participant count
+    const participantCountElement = document.getElementById('participantCount');
+    let count = parseInt(participantCountElement.innerText) + 1;
+    participantCountElement.innerText = count;
+
+    // Add new participant to the list
+    const participantList = document.getElementById('participantList');
+    const newParticipant = document.createElement('div');
+    newParticipant.className = 'btn btn btn-outline-info mb-1 text-white';
+    newParticipant.innerText = `${data.name} ${data.emoji}`;
+    participantList.appendChild(newParticipant);
+  });
 </script>
 
-
-
 <%- include('partials/footer') %>
+
 
 
 
