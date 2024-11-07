@@ -82,46 +82,66 @@ router.get('/dashboard/questionPanel/:voteSessionId', ensureAuthenticated, async
       organizer: req.session.userId,
     });
 
-    const participants = await Participant.find({ 
-      'submissions.voteSession': voteSessionId 
-    });
+    // Fetch all participants who have joined the session
+    const participants = await Participant.find({ code: voteSession.code });
 
+    const currentQuestionNumber = voteSession.questions[voteSession.voteFlag].questionNumber;
+
+    // Initialize voteCounts
     const voteCounts = {};
 
-    voteSession.questions.forEach((question) => {
-      const questionNumber = question.questionNumber;
-      voteCounts[questionNumber] = {};  
-      
-      question.options.forEach((option) => {
-        voteCounts[questionNumber][option] = 0;  
-      });
+    voteCounts[currentQuestionNumber] = {};
+
+    const currentQuestion = voteSession.questions[voteSession.voteFlag];
+    currentQuestion.options.forEach((option) => {
+      voteCounts[currentQuestionNumber][option] = 0;
     });
 
-    participants.forEach((participant) => {
-      participant.submissions.forEach((submission) => {
-        if (submission.voteSession.toString() === voteSessionId) {
-          submission.votes.forEach((vote) => {
-            const questionNumber = vote.questionNumber;
-            const selectedOption = vote.selectedOption;
-            
-            if (voteCounts[questionNumber] && voteCounts[questionNumber][selectedOption] !== undefined) {
-              voteCounts[questionNumber][selectedOption] += 1;
-            }
-          });
-        }
-      });
+    // Create a map to track which participants have voted
+    const participantsVoteStatus = {};
+
+    // Initialize all participants as not voted
+    participants.forEach((p) => {
+      participantsVoteStatus[p._id] = {
+        name: p.name,
+        emoji: p.emoji,
+        hasVoted: false,
+      };
     });
 
+    // Update the vote status based on submissions
+    participants.forEach((p) => {
+      if (p.submissions && p.submissions.length > 0) {
+        p.submissions.forEach((submission) => {
+          if (submission.voteSession.toString() === voteSessionId) {
+            submission.votes.forEach((vote) => {
+              if (vote.questionNumber === currentQuestionNumber) {
+                const selectedOption = vote.selectedOption;
 
+                // Update the participant's vote status
+                participantsVoteStatus[p._id].hasVoted = true;
+
+                // Update the vote counts
+                if (voteCounts[currentQuestionNumber][selectedOption] !== undefined) {
+                  voteCounts[currentQuestionNumber][selectedOption] += 1;
+                }
+              }
+            });
+          }
+        });
+      }
+    });
 
     const revealFlag = voteSession.revealFlag || false;
 
-    res.render('questionPanel', { voteSession, voteCounts, revealFlag });
+    // Pass participantsVoteStatus to the view
+    res.render('questionPanel', { voteSession, voteCounts, revealFlag, participantsVoteStatus });
   } catch (error) {
     console.error(error);
     res.render('controlPanel', { voteSession: [] });
   }
 });
+
 
 
 // POST method on Question Panel

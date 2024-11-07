@@ -67,10 +67,12 @@ router.post('/takevote/:voteSessionCode', async (req, res) => {
       submission.votes.push(newVote); 
       await participant.save();
 
-      // Emit event to update votes
+      // Emit event to update votes and participant status
       req.io.to(`session_${code}`).emit('voteSubmitted', {
         questionNumber: currentQuestion.questionNumber,
         selectedOption,
+        participantId: participant._id,
+        participantName: participant.name,
       });
       
     res.redirect(`/takevote/${voteSession.code}`);

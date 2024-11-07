@@ -61,6 +61,18 @@
         <% } %>
       </div>
     </div>
+
+        <!-- Vote submission tracker -->
+        <h5 class="mt-5 text-warning">Participants:</h5>
+        <div class="participant-list">
+          <% Object.values(participantsVoteStatus).forEach(function(participant) { %>
+            <button type="button" class="btn btn-outline-light mb-2 participant-button
+              <% if (participant.hasVoted) { %> active <% } %>">
+              <%= participant.name %> <%= participant.emoji %>
+            </button>
+          <% }); %>
+        </div>
+
   </div>
 </div>
 
@@ -79,6 +91,18 @@
 
   // Listen for voteSubmitted event
   socket.on('voteSubmitted', (data) => {
+
+    // Find the participant button and update its status
+    const participantButtons = document.querySelectorAll('.participant-button');
+    participantButtons.forEach((button) => {
+      if (button.textContent.trim().includes(data.participantName)) {
+        button.classList.add('active');
+      }
+    });
+
+
+
+
     const optionContainers = document.querySelectorAll('.option-container');
 
     let totalVotes = 0;
@@ -110,6 +134,15 @@
       progressBar.setAttribute('aria-valuenow', percentage);
     });
   });
+
+  socket.on('nextQuestion', (data) => {
+  // Reset participant buttons
+  const participantButtons = document.querySelectorAll('.participant-button');
+  participantButtons.forEach((button) => {
+    button.classList.remove('active');
+  });
+
+});
 </script>
 
 
