@@ -114,8 +114,9 @@ router.get('/dashboard/questionPanel/:voteSessionId', ensureAuthenticated, async
 
 
 
+    const revealFlag = voteSession.revealFlag || false;
 
-    res.render('questionPanel', { voteSession, voteCounts });
+    res.render('questionPanel', { voteSession, voteCounts, revealFlag });
   } catch (error) {
     console.error(error);
     res.render('controlPanel', { voteSession: [] });
@@ -127,8 +128,8 @@ router.get('/dashboard/questionPanel/:voteSessionId', ensureAuthenticated, async
 router.post('/dashboard/questionPanel/:voteSessionId', ensureAuthenticated, async (req, res) => {
   try {
     const voteSessionId = req.params.voteSessionId;
+    const action = req.body.action;
 
-    // Fetch the VoteSession document
     const voteSession = await VoteSession.findOne({
       _id: voteSessionId,
       organizer: req.session.userId,
@@ -138,42 +139,86 @@ router.post('/dashboard/questionPanel/:voteSessionId', ensureAuthenticated, asyn
       throw new Error('VoteSession not found');
     }
 
-    // Increment the voteFlag to move to the next question
-    voteSession.voteFlag += 1;
-    await voteSession.save();
 
-    // Determine if the vote has just started
-    if (voteSession.voteFlag === 0) {
-      // Emit 'voteStarted' event to all participants in the session room
-      req.io.to(`session_${voteSession.code}`).emit('voteStarted', {
-        voteSessionId: voteSession._id,
-        code: voteSession.code,
+    // Reveal or Next question
+    if (action === 'reveal') {
+      voteSession.revealFlag = true;
+      await voteSession.save();
+    
+      const participants = await Participant.find({ 
+        'submissions.voteSession': voteSessionId 
       });
-    }
-
-    // 'voteStarted' event for lobby
-    if (voteSession.voteFlag == 0) {
-      req.io.to(`session_${voteSession.code}`).emit('voteStarted', {
-        voteFlag: voteSession.voteFlag,
-        questionNumber: voteSession.questions[voteSession.voteFlag].questionNumber,
+    
+      const currentQuestionNumber = voteSession.questions[voteSession.voteFlag].questionNumber;
+      const questionVoteCounts = {};
+    
+      voteSession.questions[voteSession.voteFlag].options.forEach((option) => {
+        questionVoteCounts[option] = 0;  
       });
-    }
-
-    // Optionally, emit 'nextQuestion' event for subsequent questions
-    if (voteSession.voteFlag > 0 && voteSession.voteFlag < voteSession.questions.length) {
-      req.io.to(`session_${voteSession.code}`).emit('nextQuestion', {
-        voteFlag: voteSession.voteFlag,
-        questionNumber: voteSession.questions[voteSession.voteFlag].questionNumber,
+    
+      participants.forEach((participant) => {
+        participant.submissions.forEach((submission) => {
+          if (submission.voteSession.toString() === voteSessionId) {
+            submission.votes.forEach((vote) => {
+              if (vote.questionNumber === currentQuestionNumber) {
+                const selectedOption = vote.selectedOption;
+                if (questionVoteCounts[selectedOption] !== undefined) {
+                  questionVoteCounts[selectedOption] += 1;
+                }
+              }
+            });
+          }
+        });
       });
-    }
-
-    // Redirect to the appropriate page based on voteFlag and emit
-    if (voteSession.voteFlag >= voteSession.questions.length) {
-      req.io.to(`session_${voteSession.code}`).emit('voteEnd');
-
-      res.redirect(`/organizer/dashboard/questionPanelEnd/${voteSessionId}`);
-    } else {
+    
+      // Emit 'revealResults' event to participants
+      req.io.to(`session_${voteSession.code}`).emit('revealResults', {
+        questionNumber: currentQuestionNumber,
+        voteCounts: questionVoteCounts,
+      });
+    
+      // Redirect back to the same question panel, passing the revealFlag
       res.redirect(`/organizer/dashboard/questionPanel/${voteSessionId}`);
+
+    } else {
+
+      voteSession.voteFlag += 1;
+      voteSession.revealFlag = false;
+      await voteSession.save();
+
+      // Determine if the vote has just started
+      if (voteSession.voteFlag === 0) {
+        // Emit 'voteStarted' event to all participants in the session room
+        req.io.to(`session_${voteSession.code}`).emit('voteStarted', {
+          voteSessionId: voteSession._id,
+          code: voteSession.code,
+        });
+      }
+
+      // 'voteStarted' event for lobby
+      if (voteSession.voteFlag == 0) {
+        req.io.to(`session_${voteSession.code}`).emit('voteStarted', {
+          voteFlag: voteSession.voteFlag,
+          questionNumber: voteSession.questions[voteSession.voteFlag].questionNumber,
+        });
+      }
+
+      // Optionally, emit 'nextQuestion' event for subsequent questions
+      if (voteSession.voteFlag > 0 && voteSession.voteFlag < voteSession.questions.length) {
+        req.io.to(`session_${voteSession.code}`).emit('nextQuestion', {
+          voteFlag: voteSession.voteFlag,
+          questionNumber: voteSession.questions[voteSession.voteFlag].questionNumber,
+        });
+      }
+
+      // Redirect to the appropriate page based on voteFlag and emit
+      if (voteSession.voteFlag >= voteSession.questions.length) {
+        req.io.to(`session_${voteSession.code}`).emit('voteEnd');
+
+        res.redirect(`/organizer/dashboard/questionPanelEnd/${voteSessionId}`);
+      } else {
+        res.redirect(`/organizer/dashboard/questionPanel/${voteSessionId}`);
+      }
     }
   } catch (error) {
     console.error(error);

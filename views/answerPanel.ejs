@@ -15,6 +15,7 @@
         </h4>
   
         <!-- Display options as clickable radio buttons styled as buttons -->
+        <div id="votingOptionsContainer">
         <h5 class="card-text">
           <span class="text-light">
             <form action="/takevote/<%= voteSession.code %>" method="POST">
@@ -32,6 +33,29 @@
                 <button type="button" class="btn btn-warning mt-3 w-50" disabled>Submitted</button>
               <% } %>
             </form>
+            </div>
+
+            <!-- Progress Bar Reveal -->
+            <div id="progressBarContainer" style="display: none;">
+              <% if (voteSession && voteSession.questions.length > 0) { %>
+                <% const currentQuestion = voteSession.questions[voteSession.voteFlag]; %>
+                <!-- Progress bars for each option -->
+                <% currentQuestion.options.forEach(function(option) { %>
+                  <div class="option-container mb-2">
+                    <div class="option-text text-light">
+                      <%= option %> (<span class="text-info" id="count-<%= option %>">0 votes</span>)
+                    </div>
+                    <div class="progress">
+                      <div class="progress-bar bg-warning progress-bar-striped progress-bar-animated" role="progressbar"
+                        style="width: 0%;" id="progress-<%= option %>" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                      </div>
+                    </div>
+                  </div>
+                <% }); %>
+              <% } %>
+            </div>
+
+
           </span>
         </h5>
       <% } else { %>
@@ -62,20 +86,108 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
   const socket = io();
-  
+
   // Join the session room
   socket.emit('joinRoom', { room: 'session_<%= voteSession.code %>' });
 
-  // Listen for next question
+  // Add event listeners to toggle the 'active' class on radio button click
+  document.querySelectorAll('input[type="radio"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      document.querySelectorAll('label.btn').forEach(function(label) {
+        label.classList.remove('active');
+      });
+      if (radio.checked) {
+        radio.closest('label').classList.add('active');
+      }
+    });
+  });
+
+  // Listen for 'revealResults' event
+  socket.on('revealResults', (data) => {
+    // Hide the voting options container
+    const votingOptionsContainer = document.getElementById('votingOptionsContainer');
+    if (votingOptionsContainer) {
+      votingOptionsContainer.style.display = 'none';
+    }
+
+    // Show the progress bar container
+    const progressBarContainer = document.getElementById('progressBarContainer');
+    if (progressBarContainer) {
+      progressBarContainer.style.display = 'block';
+    }
+
+    // Update the progress bars with vote counts
+    const voteCounts = data.voteCounts;
+    let totalVotes = 0;
+
+    // Calculate total votes
+    for (let option in voteCounts) {
+      totalVotes += voteCounts[option];
+    }
+
+    // Update each progress bar
+    for (let option in voteCounts) {
+      const count = voteCounts[option];
+      const percentage = totalVotes > 0 ? (count / totalVotes) * 100 : 0;
+
+      // Update count text
+      const countElement = document.getElementById(`count-${option}`);
+      if (countElement) {
+        countElement.innerText = `${count} vote${count !== 1 ? 's' : ''}`;
+      }
+
+      // Update progress bar
+      const progressBar = document.getElementById(`progress-${option}`);
+      if (progressBar) {
+        progressBar.style.width = `${percentage}%`;
+        progressBar.setAttribute('aria-valuenow', percentage);
+      }
+    }
+  });
+
+  // Handle 'nextQuestion' event to reset the view for the next question
   socket.on('nextQuestion', (data) => {
-    window.location.reload();
+    // Hide the progress bar container
+    const progressBarContainer = document.getElementById('progressBarContainer');
+    if (progressBarContainer) {
+      progressBarContainer.style.display = 'none';
+    }
+
+    // Show the voting options container
+    const votingOptionsContainer = document.getElementById('votingOptionsContainer');
+    if (votingOptionsContainer) {
+      votingOptionsContainer.style.display = 'block';
+    }
+
+    // Optionally, reset the voting form
+    const form = document.querySelector('#votingOptionsContainer form');
+    if (form) {
+      form.reset();
+      document.querySelectorAll('label.btn').forEach(function(label) {
+        label.classList.remove('active');
+      });
+    }
+
+    // Clear progress bars for the next question
+    document.querySelectorAll('.progress-bar').forEach(function(progressBar) {
+      progressBar.style.width = '0%';
+      progressBar.setAttribute('aria-valuenow', 0);
     });
 
-    // Listen for voteEnd
+    // Reset vote counts
+    document.querySelectorAll('.text-info').forEach(function(countElement) {
+      countElement.innerText = '0 votes';
+    });
+
+    window.location.reload();
+  });
+
+  // Handle 'voteEnd' event to navigate to the end page
   socket.on('voteEnd', (data) => {
     window.location.reload();
-    });
+  });
 </script>
+
 
 
 

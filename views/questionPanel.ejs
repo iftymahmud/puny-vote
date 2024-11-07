@@ -39,7 +39,16 @@
                     </div>
                   <% }); %>
                 </div>
-                <button type="submit" class="btn btn-outline-warning mt-3 w-50">Next</button>
+                <button type="submit" name="action" value="reveal" class="btn mt-3 w-25
+                  <% if (revealFlag) { %>
+                    btn-info active
+                  <% } else { %>
+                    btn-outline-info
+                  <% } %>"
+                  <% if (revealFlag) { %> disabled <% } %>>
+                  Reveal
+                </button>
+                <button type="submit" name="action" value="next" class="btn btn-outline-warning mt-3 w-25">Next</button>
               </form>
             </span>
           </h5>
