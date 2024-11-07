@@ -107,7 +107,21 @@ input[type="radio"] {
     background-color: #EEEEEE;
   }
 
-
-
+/* Chatbox */
+  .chatbox {
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 8px;
+  }
+  
+  .chatMessages {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+  }
+  
+  .chat-message {
+    margin-bottom: 5px;
+  }
 
 

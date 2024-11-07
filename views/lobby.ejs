@@ -22,6 +22,20 @@
         <% } %>
       </div>
     </div>
+
+    <!-- ChatBox -->
+     <br><br>
+    <div class="chatbox mt-5">
+      <h3>Chatbox</h3>
+      <div id="chatMessages" class="chatMessages"></div>
+      <div class="input-group mt-3">
+        <input type="text" id="chatInput" class="form-control" placeholder="Type your message..." />
+        <button id="sendChat" class="btn btn-info">Send</button>
+      </div>
+    </div>
+
+
+
   </div>
 </div>
 
@@ -53,6 +67,24 @@
 
 
 
+  // Send chat message on button click
+  document.getElementById('sendChat').addEventListener('click', () => {
+    const message = document.getElementById('chatInput').value.trim();
+    if (message) {
+      socket.emit('chatMessage', { message });
+      document.getElementById('chatInput').value = ''; // Clear input
+    }
+  });
+
+  // Display incoming chat messages
+  socket.on('receiveChatMessage', (data) => {
+    const chatMessages = document.getElementById('chatMessages');
+    const newMessage = document.createElement('div');
+    newMessage.classList.add('chat-message');
+    newMessage.innerHTML = `<strong class="text-warning">${data.name} ${data.emoji}</strong>: ${data.message}`;
+    chatMessages.appendChild(newMessage);
+    chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll to the newest message
+  });
 
 
 </script>

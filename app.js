@@ -5,9 +5,10 @@ const path = require('path');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
-const http = require('http'); // Import the http module
-const socketIO = require('socket.io'); // Import socket.io
-const sharedsession = require('express-socket.io-session'); // For sharing sessions
+const http = require('http'); 
+const socketIO = require('socket.io'); 
+const sharedsession = require('express-socket.io-session'); 
+const Participant = require('./models/Participant');
 
 const app = express();
 const server = http.createServer(app); // Create an HTTP server
@@ -96,6 +97,18 @@ io.on('connection', (socket) => {
   socket.on('joinRoom', (data) => {
     socket.join(data.room);
     console.log(`User joined room: ${data.room}`);
+  });
+
+  socket.on('chatMessage', async (data) => {
+    const participant = await Participant.findById(socket.handshake.session.userId);
+    if (participant) {
+      const chatData = {
+        name: participant.name,
+        emoji: participant.emoji,
+        message: data.message,
+      };
+      io.to(`session_${participant.code}`).emit('receiveChatMessage', chatData);
+    }
   });
 
   // Handle disconnects
