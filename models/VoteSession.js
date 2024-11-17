@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 
 const QuestionSchema = new mongoose.Schema({
   questionNumber: Number,
-  voteType: { type: String, enum: ['fibonacci', 'tshirt', 'custom'], required: true },
+  voteType: { type: String, enum: ['fibonacci', 'tshirt', 'thumbsupdown', 'mood', 'custom'], required: true },
   questionText: { type: String, required: true },
   options: [{ type: String, required: true }],
 });

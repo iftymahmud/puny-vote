@@ -36,6 +36,30 @@
               onclick="setVoteType('tshirt')"> T-Shirt
           </label>
 
+          <!-- Thumbs Up/Down Radio Button -->
+          <label class="btn btn-outline-info mb-2 <%= lastType === 'thumbsupdown' ? 'active' : '' %>">
+            <input 
+              type="radio" 
+              name="voteTypeRadio" 
+              value="thumbsupdown" 
+              id="option4" 
+              autocomplete="off" 
+              <%= lastType === 'thumbsupdown' ? 'checked' : '' %> 
+              onclick="setVoteType('thumbsupdown')"> Thumbs U/D
+          </label>
+
+          <!-- Mood Emojis Radio Button -->
+          <label class="btn btn-outline-info mb-2 <%= lastType === 'mood' ? 'active' : '' %>">
+            <input 
+              type="radio" 
+              name="voteTypeRadio" 
+              value="mood" 
+              id="option5" 
+              autocomplete="off" 
+              <%= lastType === 'mood' ? 'checked' : '' %> 
+              onclick="setVoteType('mood')"> Mood
+          </label>
+
           <!-- Custom Radio Button -->
           <label class="btn btn-outline-info mb-2 <%= lastType === 'custom' ? 'active' : '' %>">
             <input 
@@ -82,6 +106,16 @@
               <%- include('types/tshirt') %>
             </div>
 
+            <!-- Thumbs Up/Down Section (Visible if lastType is 'thumbsupdown') -->
+            <div id="thumbsupdownSection" style="display: none;">
+              <%- include('types/thumbsupdown') %>
+            </div>
+
+            <!-- Mood Emojis Section (Visible if lastType is 'mood') -->
+            <div id="moodSection" style="display: none;">
+              <%- include('types/mood') %>
+            </div>
+
             <!-- Custom Section (Visible if lastType is 'custom') -->
             <div id="customSection" style="display: none;">
               <%- include('types/custom') %>
@@ -109,11 +143,15 @@
     // Hide all sections initially
     document.getElementById('fibonacciSection').style.display = 'none';
     document.getElementById('tshirtSection').style.display = 'none';
+    document.getElementById('thumbsupdownSection').style.display = 'none';
+    document.getElementById('moodSection').style.display = 'none';
     document.getElementById('customSection').style.display = 'none';
 
     // Disable all inputs initially
     disableSectionInputs('fibonacciSection');
     disableSectionInputs('tshirtSection');
+    disableSectionInputs('thumbsupdownSection');
+    disableSectionInputs('moodSection');
     disableSectionInputs('customSection');
 
     // Show the selected section and enable its inputs
@@ -123,6 +161,12 @@
     } else if (type === 'tshirt') {
       document.getElementById('tshirtSection').style.display = 'block';
       enableSectionInputs('tshirtSection');
+    } else if (type === 'thumbsupdown') {
+      document.getElementById('thumbsupdownSection').style.display = 'block';
+      enableSectionInputs('thumbsupdownSection');
+    } else if (type === 'mood') {
+      document.getElementById('moodSection').style.display = 'block';
+      enableSectionInputs('moodSection');
     } else if (type === 'custom') {
       document.getElementById('customSection').style.display = 'block';
       enableSectionInputs('customSection');
