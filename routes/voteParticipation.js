@@ -73,6 +73,7 @@ router.post('/takevote/:voteSessionCode', async (req, res) => {
         selectedOption,
         participantId: participant._id,
         participantName: participant.name,
+        participantEmoji: participant.emoji,
       });
       
     res.redirect(`/takevote/${voteSession.code}`);

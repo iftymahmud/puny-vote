@@ -31,7 +31,7 @@
                     <% const percentage = totalVotes > 0 ? (count / totalVotes) * 100 : 0; %>
                     <div class="option-container mb-2">
                       <div class="option-text text-light">
-                        <%= option %> (<span class="text-info"><%= count %> vote<%= count !== 1 ? 's' : '' %></span>)
+                        <%= option %> (<span class="text-info"><%= count %> vote<%= count !== 1 ? 's' : '' %></span>) <span class="emoji-container"></span>
                       </div>
                       <div class="progress">
                         <div class="progress-bar bg-warning progress-bar-striped progress-bar-animated" role="progressbar" style="width: <%= percentage %>%;" aria-valuenow="<%= percentage %>" aria-valuemin="0" aria-valuemax="100"></div>
@@ -92,48 +92,52 @@
   // Listen for voteSubmitted event
   socket.on('voteSubmitted', (data) => {
 
-    // Find the participant button and update its status
-    const participantButtons = document.querySelectorAll('.participant-button');
-    participantButtons.forEach((button) => {
-      if (button.textContent.trim().includes(data.participantName)) {
-        button.classList.add('active');
-      }
-    });
-
-
-
-
-    const optionContainers = document.querySelectorAll('.option-container');
-
-    let totalVotes = 0;
-
-    // Update the vote count for each option and calculate the new total votes
-    optionContainers.forEach(container => {
-      const optionText = container.querySelector('.option-text').innerText.trim();
-      const countElement = container.querySelector('.text-info');
-      let count = parseInt(countElement.innerText.split(' ')[0]);
-
-      // Check if the current option is the submitted one
-      if (optionText.startsWith(data.selectedOption)) {
-        count += 1; 
-        countElement.innerText = `${count} vote${count !== 1 ? 's' : ''}`;
-      }
-
-      totalVotes += count;
-    });
-
-    // Update the progress bars based on the new percentages
-    optionContainers.forEach(container => {
-      const countElement = container.querySelector('.text-info');
-      const progressBar = container.querySelector('.progress-bar');
-      const count = parseInt(countElement.innerText.split(' ')[0]);
-      const percentage = totalVotes > 0 ? (count / totalVotes) * 100 : 0;
-
-      // Update the width of the progress bar
-      progressBar.style.width = `${percentage}%`;
-      progressBar.setAttribute('aria-valuenow', percentage);
-    });
+  // Find the participant button and update its status
+  const participantButtons = document.querySelectorAll('.participant-button');
+  participantButtons.forEach((button) => {
+    if (button.textContent.trim().includes(data.participantName)) {
+      button.classList.add('active');
+    }
   });
+
+  const optionContainers = document.querySelectorAll('.option-container');
+
+  let totalVotes = 0;
+
+  // Update the vote count for each option and calculate the new total votes
+  optionContainers.forEach(container => {
+    const optionText = container.querySelector('.option-text').innerText.trim();
+    const countElement = container.querySelector('.text-info');
+    let count = parseInt(countElement.innerText.split(' ')[0]);
+
+    // Check if the current option is the submitted one
+    if (optionText.startsWith(data.selectedOption)) {
+      count += 1; 
+      countElement.innerText = `${count} vote${count !== 1 ? 's' : ''}`;
+
+      // Append the participant's emoji
+      const emojiContainer = container.querySelector('.emoji-container');
+      const emojiSpan = document.createElement('span');
+      emojiSpan.textContent = ` ${data.participantEmoji}`; // Add space before emoji
+      emojiContainer.appendChild(emojiSpan);
+    }
+
+    totalVotes += count;
+  });
+
+  // Update the progress bars based on the new percentages
+  optionContainers.forEach(container => {
+    const countElement = container.querySelector('.text-info');
+    const progressBar = container.querySelector('.progress-bar');
+    const count = parseInt(countElement.innerText.split(' ')[0]);
+    const percentage = totalVotes > 0 ? (count / totalVotes) * 100 : 0;
+
+    // Update the width of the progress bar
+    progressBar.style.width = `${percentage}%`;
+    progressBar.setAttribute('aria-valuenow', percentage);
+  });
+  });
+
 
   socket.on('nextQuestion', (data) => {
   // Reset participant buttons
