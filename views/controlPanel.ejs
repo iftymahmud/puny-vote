@@ -4,13 +4,27 @@
   <div class="signBox">
     <h2>Session Started...</h2>
 
-      <div class="card mt-5 bg-dark controlPanelCodeBox" style="width: 30rem;">
+      <div class="card mt-5 bg-dark controlPanelCodeBox" style="width: 40rem;">
         <div class="card-body">
-          <h4 class="card-title"><%= voteSession.title %></h4>
-          <h6 class="card-subtitle mb-2 text-body-secondary text-muted"><i class="fa-regular fa-clock"></i> <%= voteSession.dateCreated.toDateString() %></h6>
-          <h5 class="card-text">
-            Code: <span class="text-warning"><%= voteSession.code %></span>
-          </h5>
+          
+          <div class="row">
+            <div class="col">
+              <h4 class="card-title"><%= voteSession.title %></h4>
+              <h6 class="card-subtitle mb-2 text-body-secondary text-muted"><i class="fa-regular fa-clock"></i> <%= voteSession.dateCreated.toDateString() %></h6>
+              <h5 class="card-text">
+                Code: <span class="text-warning"><%= voteSession.code %></span>
+              </h5>
+              <br><br><br>
+              <h6>Or, Scan the QR Code <i class="fa-solid fa-angles-right"></i></h6>
+            </div>
+            <div class="col">
+               <!-- Display QR Code -->
+              <div class="text-right">
+                <img src="<%= qrCodeDataURL %>" alt="QR Code for Joining" />
+              </div>
+            </div>
+          </div>
+      
         </div>
       </div>
 

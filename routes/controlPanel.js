@@ -4,6 +4,7 @@ const router = express.Router();
 const { ensureAuthenticated } = require('../middleware/auth');
 const VoteSession = require('../models/VoteSession');
 const Participant = require('../models/Participant');
+const QRCode = require('qrcode');
 
 // GET method to Delete Dashboard Vote List
 router.get('/dashboard/delete/:voteSessionId', ensureAuthenticated, async (req, res) => {
@@ -45,13 +46,26 @@ router.get('/dashboard/controlPanel/:voteSessionId', ensureAuthenticated, async 
     voteSession.voteFlag = -1;
     await voteSession.save();
 
+    // Generate QR Code URL
+    const joinUrl = `${req.protocol}://${req.get('host')}/join/${voteSession.code}`;
+    const qrCodeDataURL = await QRCode.toDataURL(joinUrl, {
+      color: {
+        dark: '#FFFFFF',  // White dots
+        light: '#000000'  // Black background
+      },
+      width: 200,          
+      margin: 1            
+    });
+
+
+
     // Join the Socket.IO room
     const voteSessionCode = voteSession.code;
     req.io.on('connection', (socket) => {
       socket.join(`session_${voteSessionCode}`);
     });
 
-    res.render('controlPanel', { voteSession, participant });
+    res.render('controlPanel', { voteSession, participant, qrCodeDataURL });
   } catch (error) {
     console.error(error);
     res.render('dashboard', { voteSession: [] });
