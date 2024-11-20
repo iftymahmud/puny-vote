@@ -115,7 +115,7 @@ router.get('/ai-summary/:voteSessionId', ensureAuthenticated, async (req, res) =
     });
 
     // Prepare prompt for OpenAI API
-    let prompt = `Provide a summary/report of the given for the voting session titled "${voteSession.title}". You do not need to include all the info but the key insights. Provide one question and then the insights in a 1-3 sentence paragraph and so on. Please note that the questions can be connected or separate. add appropriate HTML tags to your output too. Do not give any intro, start with questions and insights. Do not write Question 1 and so on, write 1: Question Title and so on. make the question title h4 with text-info. Use Simple english.\n\n`;
+    let prompt = `Provide a summary/report of the given for the voting session titled "${voteSession.title}". You do not need to include all the info but the key insights. Provide one question and then the insights in a 1-3 sentence paragraph and so on. Please note that the questions can be connected or separate. Options containing Fibonacci and T-Shirt type questions are about level of difficulty. Add appropriate HTML tags to your output too. Do not give any intro, start with questions and insights. Do not write Question 1 and so on, write 1: Question Title and so on. make the question title h4 with text-info. Use Simple english.\n\n`;
 
     voteSession.questions.forEach((question) => {
       prompt += `Question ${question.questionNumber}: ${question.questionText}\nOptions:\n`;
