@@ -25,24 +25,50 @@
                   <% } %>
             </span>
 
-            <div class="text-right">
-              <!-- Check if the session has ended -->
+            <div class="d-flex justify-content-end">
               <% if (voteSession.voteFlag === -2) { %>
                 <!-- Duplicate Button -->
-                <form action="/organizer/dashboard/duplicate/<%= voteSession._id %>" method="POST" class="d-inline">
+                <form action="/organizer/dashboard/duplicate/<%= voteSession._id %>" method="POST" class="d-inline ml-1">
                   <button type="submit" class="btn btn-sm btn-outline-info" title="Duplicate Session">
                     <i class="fa-regular fa-copy"></i>
                   </button>
                 </form>
-              <% } else {%>
-                <a href="/organizer/dashboard/controlPanel/<%= voteSession._id %>" class="btn btn-sm btn-outline-warning"><i class="fa-regular fa-circle-play"></i></a> 
-                <% } %>
-              <a href="/organizer/dashboard/questionPreview/<%= voteSession._id %>" class="btn btn-sm btn-outline-warning"><i class="fa-regular fa-eye"></i></a> 
-              <a href="/organizer/dashboard/delete/<%= voteSession._id %>" class="btn btn-sm btn-outline-warning"><i class="fa-regular fa-trash-can"></i></a> 
+            
+                <!-- Share Results Button -->
+                <form action="/share/<%= voteSession.code %>" method="POST" class="d-inline ml-1">
+                  <button type="submit" class="btn btn-sm btn-outline-info" title="See Complete Results">
+                    <i class="fa-regular fa-file-lines"></i>
+                  </button>
+                </form>
+            
+                <!-- AI Summary Button -->
+                <a href="/organizer/ai-summary/<%= voteSession._id %>" 
+                   class="btn btn-sm btn-outline-info ml-1" title="See AI Summary" id="ai-summary-btn">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </a>
+              <% } else { %>
+                <!-- Control Panel Button -->
+                <a href="/organizer/dashboard/controlPanel/<%= voteSession._id %>" 
+                   class="btn btn-sm btn-outline-warning ml-1" title="Control Panel">
+                  <i class="fa-regular fa-circle-play"></i>
+                </a> 
+              <% } %>
+            
+              <!-- Question Preview Button -->
+              <a href="/organizer/dashboard/questionPreview/<%= voteSession._id %>" 
+                 class="btn btn-sm btn-outline-warning ml-1" title="Preview Questions">
+                <i class="fa-regular fa-eye"></i>
+              </a> 
+            
+              <!-- Delete Button -->
+              <a href="/organizer/dashboard/delete/<%= voteSession._id %>" 
+                 class="btn btn-sm btn-outline-warning ml-1" title="Delete Session">
+                <i class="fa-regular fa-trash-can"></i>
+              </a> 
+            </div>
             
 
-
-            </div>
+            
           </li>
           <br>
         <% }) %>
@@ -50,9 +76,23 @@
     <% } else { %>
       <p>You have no vote collections yet.</p>
     <% } %>
+
+    <p id="loading-message" class="text-warning mt-2" style="display: none;">Please Wait. It will take a few seconds...</p>
   </div>
 </div>
 </div>
+
+
+<script>
+  const aiSummaryBtn = document.getElementById('ai-summary-btn');
+  const loadingMessage = document.getElementById('loading-message');
+
+  aiSummaryBtn.addEventListener('click', (e) => {
+    loadingMessage.style.display = 'block'; 
+  });
+</script>
+
+
 <%- include('partials/footer') %>
 
 
