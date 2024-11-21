@@ -27,6 +27,7 @@ db.once('open', () => {
   console.log('Connected to MongoDB');
 });
 
+
 // Middleware
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -59,7 +60,7 @@ app.use(async (req, res, next) => {
     }
   }
   // Debugging: Log the user
-  console.log('res.locals.user:', res.locals.user);
+  // console.log('res.locals.user:', res.locals.user);
   next();
 });
 
@@ -68,6 +69,7 @@ app.use((req, res, next) => {
   req.io = io;
   next();
 });
+
 
 // Set View Engine
 app.set('view engine', 'ejs');
@@ -88,6 +90,40 @@ app.use('/auth', authRouter);
 app.use('/organizer', organizerRouter);
 app.use('/organizer', questionsRouter);
 app.use('/organizer', controlPanelRouter);
+
+
+
+// Catch 404 and forward to error handler
+app.use((req, res, next) => {
+  const err = new Error('Page Not Found');
+  err.status = 404;
+  next(err);
+});
+
+// Global error handling middleware
+app.use((err, req, res, next) => {
+  res.status(err.status || 500);
+  console.error('Global error handler:', err.stack || err);
+  if (err.status === 404) {
+    res.render('404', { message: err.message });
+  } else {
+    res.render('error', { message: 'An unexpected error occurred. Please try again later.' });
+  }
+});
+
+// Handle Unhandled Rejections and Uncaught Exceptions
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection:', reason);
+  // Application-specific logging, throwing an error, or other logic here
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+  // Application-specific logging, throwing an error, or other logic here
+});
+
+
+
 
 // Socket.IO connection handler
 io.on('connection', (socket) => {
@@ -116,6 +152,8 @@ io.on('connection', (socket) => {
     console.log('A user disconnected');
   });
 });
+
+
 
 // Start Server
 const PORT = process.env.PORT || 3000;

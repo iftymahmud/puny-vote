@@ -76,21 +76,12 @@
     <% } else { %>
       <p>You have no vote collections yet.</p>
     <% } %>
-
-    <p id="loading-message" class="text-warning mt-2" style="display: none;">Please Wait. It will take a few seconds...</p>
   </div>
 </div>
 </div>
 
 
-<script>
-  const aiSummaryBtn = document.getElementById('ai-summary-btn');
-  const loadingMessage = document.getElementById('loading-message');
 
-  aiSummaryBtn.addEventListener('click', (e) => {
-    loadingMessage.style.display = 'block'; 
-  });
-</script>
 
 
 <%- include('partials/footer') %>
