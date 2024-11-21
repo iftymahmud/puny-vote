@@ -36,32 +36,32 @@
             
                 <!-- Share Results Button -->
                 <form action="/share/<%= voteSession.code %>" method="POST" class="d-inline ml-1">
-                  <button type="submit" class="btn btn-sm btn-outline-info" title="See Complete Results">
+                  <button type="submit" class="btn btn-sm btn-outline-info" data-toggle="tooltip" title="Complete Results">
                     <i class="fa-regular fa-file-lines"></i>
                   </button>
                 </form>
             
                 <!-- AI Summary Button -->
-                <a href="/organizer/ai-summary/<%= voteSession._id %>" 
-                   class="btn btn-sm btn-outline-info ml-1" title="See AI Summary" id="ai-summary-btn">
+                <a href="/organizer/ai-summary/<%= voteSession._id %>" data-toggle="tooltip"
+                   class="btn btn-sm btn-outline-info ml-1" title="AI Summary" id="ai-summary-btn">
                   <i class="fa-solid fa-wand-magic-sparkles"></i>
                 </a>
               <% } else { %>
                 <!-- Control Panel Button -->
-                <a href="/organizer/dashboard/controlPanel/<%= voteSession._id %>" 
-                   class="btn btn-sm btn-outline-warning ml-1" title="Control Panel">
+                <a href="/organizer/dashboard/controlPanel/<%= voteSession._id %>" data-toggle="tooltip"
+                   class="btn btn-sm btn-outline-warning ml-1" title="Start Vote">
                   <i class="fa-regular fa-circle-play"></i>
                 </a> 
               <% } %>
             
               <!-- Question Preview Button -->
               <a href="/organizer/dashboard/questionPreview/<%= voteSession._id %>" 
-                 class="btn btn-sm btn-outline-warning ml-1" title="Preview Questions">
+                 class="btn btn-sm btn-outline-warning ml-1" data-toggle="tooltip" title="Preview Questions">
                 <i class="fa-regular fa-eye"></i>
               </a> 
             
               <!-- Delete Button -->
-              <a href="/organizer/dashboard/delete/<%= voteSession._id %>" 
+              <a href="/organizer/dashboard/delete/<%= voteSession._id %>" data-toggle="tooltip"
                  class="btn btn-sm btn-outline-warning ml-1" title="Delete Session">
                 <i class="fa-regular fa-trash-can"></i>
               </a> 
