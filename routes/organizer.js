@@ -138,7 +138,7 @@ router.get('/ai-summary/:voteSessionId', ensureAuthenticated, async (req, res) =
       prompt += '\n';
     });
 
-    console.log(prompt);
+    // console.log(prompt);
     // Call OpenAI API
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY, 
@@ -162,6 +162,61 @@ router.get('/ai-summary/:voteSessionId', ensureAuthenticated, async (req, res) =
   } catch (error) {
     console.error(error);
     res.render('dashboard', { voteSession: [] });
+  }
+});
+
+
+
+// POST Duplicate Vote Session
+router.post('/dashboard/duplicate/:voteSessionId', ensureAuthenticated, async (req, res) => {
+  try {
+    const { voteSessionId } = req.params;
+
+    // Find the original vote session
+    const originalSession = await VoteSession.findOne({
+      _id: voteSessionId,
+      organizer: req.session.userId,
+    }).lean(); 
+
+    if (!originalSession) {
+      return res.status(404).render('dashboard', { voteSessions: [], error: 'Vote session not found.' });
+    }
+
+    // Generate a new unique code
+    let newCode;
+    let isUnique = false;
+    while (!isUnique) {
+      newCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+      const existingSession = await VoteSession.findOne({ code: newCode });
+      if (!existingSession) isUnique = true;
+    }
+
+    // Create a new vote session object
+    const duplicatedSession = new VoteSession({
+      organizer: originalSession.organizer,
+      title: originalSession.title,
+      code: newCode,
+      dateCreated: Date.now(),
+      questions: originalSession.questions.map(question => ({
+        questionNumber: question.questionNumber,
+        voteType: question.voteType,
+        questionText: question.questionText,
+        options: [...question.options],
+      })),
+      voteSessionSubmitted: 'yes',
+      voteFlag: -1, 
+      token: '', 
+      revealFlag: false,
+    });
+
+    // Save the duplicated session
+    await duplicatedSession.save();
+
+    // Redirect back to the dashboard with success message
+    res.redirect('/organizer/dashboard');
+  } catch (error) {
+    console.error(error);
+    res.render('dashboard', { voteSessions: [], error: 'An error occurred while duplicating the vote session.' });
   }
 });
 

@@ -28,7 +28,7 @@ router.post('/signup', async (req, res) => {
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 
   const isPasswordValid = passwordRegex.test(password);
-  console.log(`Password Validation: ${isPasswordValid ? 'Passed' : 'Failed'}`);
+  // console.log(`Password Validation: ${isPasswordValid ? 'Passed' : 'Failed'}`);
 
   if (!isPasswordValid) {
     return res.render('signup', { 

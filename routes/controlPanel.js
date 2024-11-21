@@ -272,7 +272,7 @@ router.get('/dashboard/questionPanelEnd/:voteSessionId', ensureAuthenticated, as
       organizer: req.session.userId,
     });
 
-    voteSession.voteFlag = -1;
+    voteSession.voteFlag = -2;
     await voteSession.save();
 
     res.render('questionPanelEnd', { voteSession });
