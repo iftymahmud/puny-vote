@@ -20,6 +20,23 @@ router.post('/signup', async (req, res) => {
     return res.render('signup', { error: 'Passwords do not match.' });
   }
 
+    // **Password Validation Start**
+  // - At least 8 characters
+  // - At least one uppercase letter
+  // - At least one lowercase letter
+  // - At least one number
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+  const isPasswordValid = passwordRegex.test(password);
+  console.log(`Password Validation: ${isPasswordValid ? 'Passed' : 'Failed'}`);
+
+  if (!isPasswordValid) {
+    return res.render('signup', { 
+      error: 'Password must be at least 8 characters long and include uppercase letters, lowercase letters, and numbers.' 
+    });
+  }
+  // **Password Validation End**
+
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {

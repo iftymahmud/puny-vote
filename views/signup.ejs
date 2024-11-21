@@ -6,7 +6,7 @@
     <% if (error) { %>
       <div class="alert alert-danger"><%= error %></div>
     <% } %>
-    <form action="/auth/signup" method="POST">
+    <form action="/auth/signup" method="POST" id="signupForm">
       <div class="form-group">
         <label>Full Name</label>
         <input type="text" name="fullName" class="form-control" required />
@@ -17,8 +17,12 @@
       </div>
       <div class="form-group">
         <label>Password</label>
-        <input type="password" name="password" class="form-control" required />
-        <!-- Password strength meter can be added here -->
+        <input type="password" name="password" class="form-control" id="password" required />
+        <small class="form-text text-muted">
+          Password must be at least 8 characters long and include uppercase letters, lowercase letters, and numbers.
+        </small>
+        <!-- Optional: Password strength meter -->
+        <div id="passwordStrength" class="mt-2"></div>
       </div>
       <div class="form-group">
         <label>Confirm Password</label>
@@ -32,3 +36,29 @@
   </div>
 </div>
 <%- include('partials/footer') %>
+
+<!-- client-side password strength feedback -->
+<script>
+  const passwordInput = document.getElementById('password');
+  const passwordStrength = document.getElementById('passwordStrength');
+
+  passwordInput.addEventListener('input', () => {
+    const password = passwordInput.value;
+    let strength = 'Weak';
+    let color = 'red';
+
+    // Simple strength check
+    if (password.length >= 8) {
+      if (/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+        strength = 'Strong';
+        color = 'green';
+      } else if (/(?=.*[a-z])(?=.*[A-Z])/.test(password)) {
+        strength = 'Medium';
+        color = 'orange';
+      }
+    }
+
+    passwordStrength.textContent = `Password Strength: ${strength}`;
+    passwordStrength.style.color = color;
+  });
+</script>
