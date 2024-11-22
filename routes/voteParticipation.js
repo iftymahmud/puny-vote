@@ -20,7 +20,7 @@ router.get('/takevote/:voteSessionCode', async (req, res) => {
       }
       
       if (voteSession.voteFlag >= voteSession.questions.length ||
-        voteSession.voteFlag == -1) {
+        voteSession.voteFlag == -1 || voteSession.voteFlag == -2) {
         res.redirect(`/takevote/end/${voteSession.code}`);
       } else {
         res.render('answerPanel', {voteSession, submitFlag});
