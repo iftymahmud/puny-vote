@@ -214,6 +214,26 @@ router.post('/dashboard/questionPanel/:voteSessionId', ensureAuthenticated, asyn
       // Redirect back to the same question panel, passing the revealFlag
       res.redirect(`/organizer/dashboard/questionPanel/${voteSessionId}`);
 
+    } else if (action === 'retake') {
+
+      const currentQuestionNumber = voteSession.questions[voteSession.voteFlag].questionNumber;
+      const participants = await Participant.find({ 'submissions.voteSession': voteSessionId });
+
+      for (const participant of participants) {
+        const submission = participant.submissions.find(sub => sub.voteSession.toString() === voteSessionId);
+        if (submission) {
+          submission.votes = submission.votes.filter(vote => vote.questionNumber !== currentQuestionNumber);
+          await participant.save();
+        }
+      }
+
+      req.io.to(`session_${voteSession.code}`).emit('retakeQuestion', {
+        questionNumber: currentQuestionNumber,
+      });
+
+      // Redirect back to the same question panel
+      res.redirect(`/organizer/dashboard/questionPanel/${voteSessionId}`);
+
     } else {
 
       voteSession.voteFlag += 1;

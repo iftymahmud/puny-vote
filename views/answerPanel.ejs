@@ -186,6 +186,36 @@
   socket.on('voteEnd', (data) => {
     window.location.reload();
   });
+
+
+
+  // Handle 'retakeQuestion' event to reset the view for the current question
+  socket.on('retakeQuestion', (data) => {
+    // Hide the progress bar container
+    const progressBarContainer = document.getElementById('progressBarContainer');
+    if (progressBarContainer) {
+      progressBarContainer.style.display = 'none';
+    }
+
+    // Show the voting options container
+    const votingOptionsContainer = document.getElementById('votingOptionsContainer');
+    if (votingOptionsContainer) {
+      votingOptionsContainer.style.display = 'block';
+    }
+
+    // Reset the voting form
+    const form = document.querySelector('#votingOptionsContainer form');
+    if (form) {
+      form.reset();
+      document.querySelectorAll('label.btn').forEach(function(label) {
+        label.classList.remove('active');
+      });
+    }
+
+    window.location.reload();
+  });
+
+
 </script>
 
 
