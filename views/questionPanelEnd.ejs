@@ -9,17 +9,38 @@
 
   <br><br>
 
-  <form action="/share/<%= voteSession.code %>" method="POST">
-    <button type="submit" class="btn btn-info">See Complete Results</button>
-  </form>
-  <br>
+  <div class="row">
+    <div class="col-sm-6 mb-3 mb-sm-0">
+      <div class="card text-dark">
+        <div class="card-body">
+          <h5 class="card-title"><strong>See Complete Results</strong></h5>
+          <p class="card-text">Takes you to a page containing this session's vote results with a sharable link.</p>
+          
 
-  <a href="/organizer/ai-summary/<%= voteSession._id %>" 
-    class="btn btn-danger" 
-    id="ai-summary-btn">See AI-Generated Summary</a>
- <p id="loading-message" class="text-warning mt-2" style="display: none;">Please Wait. It will take a few seconds...</p>
+          <form action="/share/<%= voteSession.code %>" method="POST">
+            <button type="submit" class="btn btn-info"><i class="fa-regular fa-file-lines"></i> Results</button>
+          </form>
+
+
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="card text-dark">
+        <div class="card-body">
+          <h5 class="card-title"><strong>See AI-Generated Summary</strong></h5>
+          <p class="card-text">Shows a text-based summary of this voting session with the help of OpenAI.</p>
+          
+          <a href="/organizer/ai-summary/<%= voteSession._id %>" 
+            class="btn btn-danger" 
+            id="ai-summary-btn"><i class="fa-solid fa-wand-magic-sparkles"></i> Summary</a>
+        </div>
+      </div>
+      <p id="loading-message" class="text-warning mt-2" style="display: none;"><i class="fa-solid fa-spinner"></i> It will take a few seconds...</p>
+    </div>
+  </div>
+
  
-  <br><br>
 
   <br><br><br>
 
